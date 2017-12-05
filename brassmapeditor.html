@@ -1,0 +1,400 @@
+<!-- 
+=============================================================================
+BRASS Map editor 
+
+Author: Javier Camara
+
+Usage: 
+  
+  1. Put on a web server, or create a local one running "python -m SimpleHTTPServer"
+     from the folder where the editor is.
+  2. Load on web browser (tested in Chrome Version 59.0.3071.115 (64-bit) OSX.
+    (e.g., "http://localhost:8000/brassmapeditor.html")
+  2. Load a background image of the map (png) to use as reference.
+  3. Use the "location/node creation" tool ("O") to create map locations by 
+     clicking on the canvas.
+  4. Connect locations using the "connect" tool ("-").
+  5. Download the resulting map as a JSON file by clicking on the "Export Map" 
+     link.
+
+=============================================================================
+-->
+
+<label>Image:&nbsp;</label>
+<input type="file" id="imageLoader" name="imageLoader"/> &nbsp;&nbsp; 
+<label>Map:&nbsp;</label>
+<input type="file" id="mapLoader" name="mapLoader"/>  &nbsp;&nbsp; 
+<a id="exportMap" onclick="exportMap(this);" class="btn"><i class="icon-download"></i> [Export Map]</a>
+</br>
+Tools: &nbsp; 
+<button type="button" id="setOriginTool" name="setOriginTool" onclick="setToolOrigin(this)">*</button>
+<button type="button" id="connectTool" name="connectTool" onclick="setToolConnect(this)">-</button>
+<button type="button" id="createTool" name="createTool" onclick="setToolCreate(this)">O</button>
+<button type="button" id="moveTool" name="moveTool" onclick="setToolMove(this)">-></button>
+<select id="attEdit" name="attEdit">
+  <option value="cp">Collision Probability</option>
+  <option value="a2">Attribute2</option>
+</select>
+<canvas id="imageCanvas"></canvas>
+<script>
+
+// =============================================================================
+// User interface vars 
+// =============================================================================
+var imageLoader = document.getElementById('imageLoader');
+    imageLoader.addEventListener('change', importImage, false);
+
+var mapLoader = document.getElementById('mapLoader');
+    mapLoader.addEventListener('change', importMap, false);
+
+var canvas = document.getElementById('imageCanvas');
+var saveButton = document.getElementById("saveMap");
+
+var ctx = canvas.getContext('2d');
+var img =null;
+
+rx=ry=0;  // current cursor position
+v=3;
+
+grid_granularity=10;  // Snap grid cell size
+
+// =============================================================================
+// Map vars
+// =============================================================================
+
+var MPR = 18.5; // Meter to pixel ratio 
+var locationsx=[], locationsy=[], locationsl=[]; // location coordinates and labels (nodes)
+var connections=[];  // trajectories (arcs)
+var origin=[];
+
+// =============================================================================
+// Map querying (checking locations at x,y position, etc.)
+// =============================================================================
+
+
+function getLocationAt(x, y){
+  for (var i = 0; i < locationsx.length; i ++) {
+    if (locationsx[i]==x && locationsy[i]==y)
+      return locationsl[i];
+  }
+  return "";
+}
+
+function getLocationIndex(label){
+   for (var i = 0; i < locationsl.length; i ++) {
+    if (locationsl[i]==label)
+      return i;
+  }
+  return -1;
+}
+
+function getCoords(label){
+  for (var i = 0; i < locationsl.length; i ++) {
+    if (locationsl[i]==label)
+      return ({x:locationsx[i],y:locationsy[i]});
+  }
+}
+
+function getConnections(label){
+  var result=[];
+  for (var i=0; i < connections.length; i++){
+    if (connections[i].from==label)
+      result.push(connections[i].to);
+  }
+  return result;
+}
+
+function pixelsToMeters(coords){
+	var result = [];
+	return ([((coords[0]-origin[0])/MPR).toFixed(3), ((origin[1]-coords[1])/MPR).toFixed(3)]);
+}
+
+function metersToPixels(coords){
+	var result = [];
+	return ([origin[0]+coords[0]*MPR, origin[1]-coords[1]*MPR]);
+}
+
+
+// =============================================================================
+// Tool vars
+// =============================================================================
+
+var tool = 0; // tool= 0 create, 1 connect, 2 move
+var initStroke, endStroke;   // Location aux vars for tools
+var connecting=false, moving=false;  // Aux var for connection and moving tool
+
+// =============================================================================
+// Tool manipulation and canvas event handling
+// =============================================================================
+
+function setToolConnect(){
+  connecting = false;
+  moving = false;
+  tool = 1;
+}
+function setToolCreate(){
+  connecting = false;
+  moving = false;
+  tool = 0;
+}
+
+function setToolMove(){
+  connecting = false;
+  moving = false;
+  tool = 2;
+}
+
+function setToolOrigin(){
+  connecting = false;
+  moving = false;
+  tool = 3;
+}
+
+
+function moveReporter(e){
+  ex = e.pageX-10;
+  ey = e.pageY-40;
+  rx=Math.floor(ex/grid_granularity)*grid_granularity;
+  ry=Math.floor(ey/grid_granularity)*grid_granularity;
+   
+  if (tool==2 && moving==true){
+    mindex = getLocationIndex(initStroke);
+    locationsx[mindex] = rx;
+    locationsy[mindex] = ry;
+  }
+}
+
+function clickReporter(e){
+  
+  if (tool==0){ // Creating nodes for locations
+    locationsx.push(rx);
+    locationsy.push(ry);
+    locationsl.push("l"+locationsx.length.toString());
+    }
+
+  if (tool==1){ // Creating connections between locations
+    if (connecting==false){  // If starting a connection (selecting start node)
+      initStroke = getLocationAt(rx,ry);
+      if (initStroke!=""){
+        connecting = true;
+      }
+    } else {   // If finishing a connection (selecting end node)
+      endStroke = getLocationAt(rx,ry);
+      if (endStroke!=""){
+        connecting = false;
+        connections.push({from:initStroke,to:endStroke}); // Connections are bidirectional
+        connections.push({from:endStroke,to:initStroke});
+        }
+    }
+  }
+
+  if (tool==2){ // Moving node
+    if (moving == false) {
+      initStroke = getLocationAt(rx,ry);
+      if (initStroke!=""){
+        moving = true;
+      }
+    }
+    else
+      moving = false;
+  }
+
+  if (tool==3){ // Setting origin of coordinates
+  	origin[0] = rx;
+  	origin[1] = ry;
+  }
+
+}
+
+// =============================================================================
+// Import/Export of Map Data (JSON) and BG map image
+// =============================================================================
+
+
+function exportMap(el) {
+    var map = [];
+
+    for (var i = 0; i < locationsx.length; i ++) {
+      var mcoord = pixelsToMeters([locationsx[i], locationsy[i]]);
+      var coord = {x: mcoord[0] , y: mcoord[1]};
+      var obj = {"node-id": locationsl[i], coords:coord, "connected-to":getConnections(locationsl[i])};
+      map.push(obj);
+    }
+
+    var jsonobj = {map: map, "unsafe-rects": []};
+    var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(jsonobj));
+    el.setAttribute("href", "data:"+data);
+    el.setAttribute("download", "data.json");    
+}
+
+function importMap(e){
+  var reader = new FileReader();
+  reader.onload = load(e.target.files[0]);
+}
+
+function getURLPath(urlStr){
+	var pathArray = urlStr.split( '/' );
+	var newPathname = "";
+    for (var i = 1; i < pathArray.length-1; i++) {
+      newPathname += "/";
+      newPathname += pathArray[i];
+    }
+    return newPathname;
+}
+
+function load(filename) {
+	var filename2 =getURLPath(window.location.href)+"/data2.json";
+    loadJSON(filename2, function(response) {  
+        var actual_JSON = JSON.parse(response);
+        //console.log(actual_JSON);
+        clearMap();
+        parseMap(actual_JSON);
+    });   
+}
+
+function loadJSON(file, callback) {   
+
+    var xobj = new XMLHttpRequest();
+    xobj.overrideMimeType("application/json");
+    xobj.open('GET', file, true); // Replace 'my_data' with the path to your file
+    xobj.onreadystatechange = function () {
+          if (xobj.readyState == 4 && xobj.status == "200") {
+            // Required use of an anonymous callback as .open will NOT return a value but simply returns undefined in asynchronous mode
+            callback(xobj.responseText);
+          }
+    };
+    xobj.send(null);  
+ }
+ 
+ function clearMap(){
+ 	locationsx = [];
+ 	locationsy = [];
+ 	locationsl = [];
+ 	connections = [];
+ }
+
+ function parseMap (JSONmap){
+ 	for (var i=0; i<JSONmap["map"].length; i++){
+ 		pcoord = metersToPixels([JSONmap["map"][i]["coords"]["x"], JSONmap["map"][i]["coords"]["y"]]);
+ 		locationsx.push(pcoord[0]);
+ 		locationsy.push(pcoord[1]);
+ 		locationsl.push(JSONmap["map"][i]["node-id"]);
+ 		for (var j=0; j<JSONmap["map"][i]["connected-to"].length; j++){
+ 			connections.push({from:JSONmap["map"][i]["node-id"],to:JSONmap["map"][i]["connected-to"][j]});
+ 		} 		 			
+ 	}
+
+ }
+
+function importImage(e){
+    var reader = new FileReader();
+    reader.onload = function(event){
+        img = new Image();
+        img.onload = function(){
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img,0,0);
+            rx=canvas.width/2;
+            ry=canvas.height/2; 
+            setInterval(update,1000/20);
+            canvas.addEventListener('mousemove', moveReporter, false);
+            canvas.addEventListener('click',clickReporter,false);
+            origin.push(0);
+            origin.push(img.height);
+        }
+        img.src = event.target.result;
+    }
+    reader.readAsDataURL(e.target.files[0]); 
+
+}    
+
+// =============================================================================
+// Rendering 
+// =============================================================================
+
+function update(){
+  ctx.drawImage(img,0,0);
+  render();
+  ctx.fillStyle = "rgb(200, 200, 200)";
+  ctx.fillRect(rx-grid_granularity/2, ry-grid_granularity/2, grid_granularity, grid_granularity);
+}
+
+function render(){
+  drawGrid();
+  drawCoordinates();
+  drawTool();
+  drawLocations();
+  drawConnections();
+  drawOrigin();
+}
+
+function drawGrid(){
+	ctx.strokeStyle = '#cccccc';
+	ctx.strokeStyle = "rgba(200, 200, 200 ,0.3)";
+  	ctx.lineWidth=1;
+	ctx.beginPath();
+  	for (var i = grid_granularity; i < canvas.height; i += grid_granularity) {
+    	ctx.moveTo(0, i);
+    	ctx.lineTo(canvas.width, i);
+  	}
+  	for (var j = grid_granularity; j < canvas.width; j += grid_granularity) {
+    	ctx.moveTo(j, 0);
+    	ctx.lineTo(j, canvas.height);
+  	}
+  	ctx.stroke();
+}
+
+function drawCoordinates(){
+	ctx.fillStyle = "rgb(0, 0, 0)";
+	ctx.font="20px Georgia";
+	var mrx = pixelsToMeters([rx,ry])[0].toString();
+	var mry = pixelsToMeters([rx,ry])[1].toString();
+//	ctx.fillText("X: "+rx.toString()+"["+mrx+"]"+" Y: "+ry.toString()+"["+mry+"]",10,30);
+	ctx.fillText("X: "+mrx+" Y: "+mry.toString(),10,30);
+}
+
+function drawTool(){
+  ctx.fillStyle = "rgb(0, 0, 0)";
+  ctx.font="20px Georgia";
+  var strTool = "[create]";
+  if (tool==1){
+    strTool = "[connect]";
+  }
+  if (tool==2){
+    strTool= "[move]";
+  }
+  if (tool==3){
+  	strTool= "[set origin]";
+  }
+  ctx.fillText("Tool:"+strTool,10,50);
+}
+
+function drawLocations(){
+  for (var i = 0; i < locationsx.length; i ++) {
+    ctx.fillStyle = "rgb(200, 0, 0)";
+    ctx.fillRect(locationsx[i]-grid_granularity/2, locationsy[i]-grid_granularity/2, grid_granularity, grid_granularity);
+    ctx.fillStyle = "rgb(0, 0, 0)";
+    ctx.font="10px Georgia";
+    ctx.fillText(locationsl[i],locationsx[i]+grid_granularity,locationsy[i]+grid_granularity);
+  }
+}
+
+function drawOrigin(){
+	ctx.fillStyle = "rgb(0, 0, 127)";
+    ctx.fillRect(origin[0]-grid_granularity, origin[1]-grid_granularity, grid_granularity*2, grid_granularity*2);
+    ctx.fillStyle = "rgb(0, 0, 255)";
+    ctx.fillRect(origin[0]-grid_granularity/2, origin[1]-grid_granularity/2, grid_granularity, grid_granularity);
+}
+
+function drawConnections(){
+  ctx.strokeStyle = '#ff0000';
+  ctx.lineWidth=2;
+  ctx.beginPath();
+  for (var i = 0; i < connections.length; i += 1) {
+      ctx.moveTo(getCoords(connections[i].from).x , getCoords(connections[i].from).y);
+      ctx.lineTo(getCoords(connections[i].to).x, getCoords(connections[i].to).y);
+    }
+  ctx.stroke();
+}
+
+</script>
