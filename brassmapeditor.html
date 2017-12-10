@@ -11,29 +11,33 @@ Usage:
   2. Load on web browser (tested in Chrome Version 59.0.3071.115 (64-bit) OSX.
     (e.g., "http://localhost:8000/brassmapeditor.html")
   2. Load a background image of the map (png) to use as reference.
-  3. Use the "location/node creation" tool ("O") to create map locations by 
+  3. Use the "location/node creation" tool to create map waypoints by 
      clicking on the canvas.
-  4. Connect locations using the "connect" tool ("-").
+  4. Connect waypoints using the "connect" tool.
+  5. draw walls using the "draw walls tool". Ctrl-z triggers undo for walls.
   5. Download the resulting map as a JSON file by clicking on the "Export Map" 
      link.
-
 =============================================================================
 -->
 
-<label>Image:&nbsp;</label>
+<label>Background map image:&nbsp;</label> 
+<input type="checkbox" title="Display background image" id="displaybackgroundcheck">
 <input type="file" id="imageLoader" name="imageLoader"/> &nbsp;&nbsp; 
 <label>Map:&nbsp;</label>
 <input type="file" id="mapLoader" name="mapLoader"/>  &nbsp;&nbsp; 
 <a id="exportMap" onclick="exportMap(this);" class="btn"><i class="icon-download"></i> [Export Map]</a>
 </br>
 Tools: &nbsp; 
-<button type="button" id="setOriginTool" name="setOriginTool" onclick="setToolOrigin(this)">*</button>
-<button type="button" id="connectTool" name="connectTool" onclick="setToolConnect(this)">-</button>
-<button type="button" id="createTool" name="createTool" onclick="setToolCreate(this)">O</button>
-<button type="button" id="moveTool" name="moveTool" onclick="setToolMove(this)">-></button>
+<button type="button" title="Set origin of coordinates" id="setOriginTool" name="setOriginTool" onclick="setToolOrigin(this)"><img src="icons/origin.png" width=15 /></button>
+<button type="button" title="Create waypoint" id="createTool" name="createTool" onclick="setToolCreate(this)"><img src="icons/location.png" width=15 /></button>
+<button type="button" title="Connect waypoints" id="connectTool" name="connectTool" onclick="setToolConnect(this)"><img src="icons/connect.png" width=15 /></button>
+<button type="button" title="Move waypoint" id="moveTool" name="moveTool" onclick="setToolMove(this)"><img src="icons/move.png" width=15 /></button>
+<button type="button" title="Draw walls" id="wallTool" name="wallTool" onclick="setToolWall(this)"><img src="icons/wall.png" width=15 /></button>
+<button type="button" title="Place obstacle" id="obstacleTool" name="obstacleTool" onclick="setToolObstacle(this)"><img src="icons/obstacle.png" width=15 /></button>
+<button type="button" title="Remove obstacle" id="removeObstacleTool" name="removeObstacleTool" onclick="setToolRemoveObstacle(this)"><img src="icons/removeobstacle.png" width=15 /></button>
 <select id="attEdit" name="attEdit">
-  <option value="cp">Collision Probability</option>
-  <option value="a2">Attribute2</option>
+  <option value="o1"> Obstacle type 1</option>
+  <option value="o2"> Obstacle type 2</option>
 </select>
 <canvas id="imageCanvas"></canvas>
 <script>
@@ -53,28 +57,35 @@ var saveButton = document.getElementById("saveMap");
 var ctx = canvas.getContext('2d');
 var img =null;
 
+var obstacleicon = new Image();
+obstacleicon.src = "/icons/obstacle.png";
+
 rx=ry=0;  // current cursor position
 v=3;
 
-grid_granularity=10;  // Snap grid cell size
+grid_granularity=5;  // Snap grid cell size
 
 // =============================================================================
 // Map vars
 // =============================================================================
 
 var MPR = 18.5; // Meter to pixel ratio 
+var origin=[];
 var locationsx=[], locationsy=[], locationsl=[]; // location coordinates and labels (nodes)
 var connections=[];  // trajectories (arcs)
-var origin=[];
+var walllocationsx=[], walllocationsy=[]; // wall location coordinates
+var obstacles=[], obstaclelabels=[]; // obstacles associated with arcs
 
 // =============================================================================
 // Map querying (checking locations at x,y position, etc.)
 // =============================================================================
 
 
+
 function getLocationAt(x, y){
   for (var i = 0; i < locationsx.length; i ++) {
-    if (locationsx[i]==x && locationsy[i]==y)
+//    if (locationsx[i]==x && locationsy[i]==y)
+    if (Math.abs(locationsx[i]-x)<=grid_granularity && Math.abs(locationsy[i]-y)<=grid_granularity)
       return locationsl[i];
   }
   return "";
@@ -111,15 +122,28 @@ function pixelsToMeters(coords){
 
 function metersToPixels(coords){
 	var result = [];
-	return ([origin[0]+coords[0]*MPR, origin[1]-coords[1]*MPR]);
+	return ([Math.floor(origin[0]+coords[0]*MPR), Math.floor(origin[1]-coords[1]*MPR)]);
 }
 
+
+function removeObstaclesBetweenLocations (l1, l2){
+  var auxobstacles=[];
+  var auxobstaclelabels=[];
+  for (var i = 0; i < obstacles.length; i += 1) {
+      if (!((obstacles[i].from==l1 && obstacles[i].to==l2) || (obstacles[i].from==l2 && obstacles[i].to==l1))){
+        auxobstaclelabels.push(obstaclelabels[i]);
+        auxobstacles.push(obstacles[i]);
+      }
+  }
+  obstacles = auxobstacles;
+  obstaclelabels = auxobstaclelabels;
+}
 
 // =============================================================================
 // Tool vars
 // =============================================================================
 
-var tool = 0; // tool= 0 create, 1 connect, 2 move
+var tool = 0; // tool= 0 create, 1 connect, 2 move, 3 setorigin, 4 Wall, 5 obstacle, 6 remove obstacle
 var initStroke, endStroke;   // Location aux vars for tools
 var connecting=false, moving=false;  // Aux var for connection and moving tool
 
@@ -150,7 +174,25 @@ function setToolOrigin(){
   tool = 3;
 }
 
+function setToolWall(){
+  connecting = false;
+  moving = false;
+  tool = 4;
+}
 
+function setToolObstacle(){
+  connecting = false;
+  moving = false;
+  tool = 5;
+}
+
+function setToolRemoveObstacle(){
+  connecting = false;
+  moving = false;
+  tool = 6;
+}
+
+// Handles mouse move events
 function moveReporter(e){
   ex = e.pageX-10;
   ey = e.pageY-40;
@@ -164,6 +206,7 @@ function moveReporter(e){
   }
 }
 
+// Handles mouse click events
 function clickReporter(e){
   
   if (tool==0){ // Creating nodes for locations
@@ -204,7 +247,62 @@ function clickReporter(e){
   	origin[1] = ry;
   }
 
+  if (tool==4){ // adding wall vertex
+    walllocationsx.push(rx);
+    walllocationsy.push(ry);
+  }
+
+  if (tool==5){ // Creating obstacles between waypoints
+    if (connecting==false){  // If starting a connection (selecting start node)
+      initStroke = getLocationAt(rx,ry);
+      if (initStroke!=""){
+        connecting = true;
+      }
+    } else {   // If finishing a connection (selecting end node)
+      endStroke = getLocationAt(rx,ry);
+      if (endStroke!=""){
+        connecting = false;
+        obstacles.push({from:initStroke,to:endStroke}); // associate obstacle with connecting arcs
+        obstacles.push({from:endStroke,to:initStroke});
+        obstaclelabels.push(attEdit.value);
+        obstaclelabels.push(attEdit.value);
+        }
+    }
+  }
+
+  if (tool==6){ // Removing obstacles between waypoints
+    if (connecting==false){  // If starting a connection (selecting start node)
+      initStroke = getLocationAt(rx,ry);
+      if (initStroke!=""){
+        connecting = true;
+      }
+    } else {   // If finishing a connection (selecting end node)
+      endStroke = getLocationAt(rx,ry);
+      if (endStroke!=""){
+        connecting = false;
+        removeObstaclesBetweenLocations(initStroke, endStroke);
+        }
+    }
+  }
+
 }
+
+// Keyboard handling
+function KeyPress(e) {
+  var evtobj = window.event? event : e
+  if (evtobj.keyCode == 90 && evtobj.ctrlKey) { // undo (ctrl+z)
+    if (tool==4){ // undo last wall
+      walllocationsx.splice(-2,2);
+      walllocationsy.splice(-2,2); 
+    }
+  }
+
+  if (evtobj.keyCode == 66 && evtobj.ctrlKey) { // toggle background image display (ctrl+b)
+    displaybackgroundcheck.checked = !displaybackgroundcheck.checked;
+  }
+}
+document.onkeydown = KeyPress;
+
 
 // =============================================================================
 // Import/Export of Map Data (JSON) and BG map image
@@ -221,7 +319,29 @@ function exportMap(el) {
       map.push(obj);
     }
 
-    var jsonobj = {map: map, "unsafe-rects": []};
+    var walls = [];
+
+    for (var i = 0; i < walllocationsx.length-1; i = i+2) {  // export walls
+      var mcoord1 = pixelsToMeters([walllocationsx[i], walllocationsy[i]]);
+      var mcoord2 = pixelsToMeters([walllocationsx[i+1], walllocationsy[i+1]]);
+      var coord1 = {x: mcoord1[0] , y: mcoord1[1]};
+      var coord2 = {x: mcoord2[0] , y: mcoord2[1]};
+      var objw = {"p1": coord1, "p2": coord2 };
+      walls.push(objw);
+    }
+
+  var objobstacles=[];
+  for (var i = 0; i < obstacles.length; i ++) {
+      var obj = {"from": obstacles[i].from, "to": obstacles[i].to, "id":obstaclelabels[i]};
+      objobstacles.push(obj);
+    }    
+
+
+    var objo = {x: origin[0], y: origin[1]}; // origin of coordinates
+    var orig = [];
+    orig.push(objo);
+
+    var jsonobj = {map: map, walls: walls, origin: orig, "unsafe-rects": [], obstacles: objobstacles };
     var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(jsonobj));
     el.setAttribute("href", "data:"+data);
     el.setAttribute("download", "data.json");    
@@ -229,7 +349,7 @@ function exportMap(el) {
 
 function importMap(e){
   var reader = new FileReader();
-  reader.onload = load(e.target.files[0]);
+  reader.onload = load(e.target.files[0]["name"]);
 }
 
 function getURLPath(urlStr){
@@ -239,16 +359,20 @@ function getURLPath(urlStr){
       newPathname += "/";
       newPathname += pathArray[i];
     }
+//    console.log(newPathname);
     return newPathname;
 }
 
+var actual_JSON;
+
 function load(filename) {
-	var filename2 =getURLPath(window.location.href)+"/data2.json";
+  console.log(filename);
+	var filename2 =getURLPath(window.location.href)+"/"+filename;
     loadJSON(filename2, function(response) {  
-        var actual_JSON = JSON.parse(response);
-        //console.log(actual_JSON);
+        actual_JSON = JSON.parse(response);
+//      console.log(actual_JSON);
         clearMap();
-        parseMap(actual_JSON);
+        parseMap();
     });   
 }
 
@@ -267,24 +391,48 @@ function loadJSON(file, callback) {
  }
  
  function clearMap(){
+  origin = [];
  	locationsx = [];
  	locationsy = [];
  	locationsl = [];
+  walllocationsx=[];
+  walllocationsy=[];
  	connections = [];
  }
 
- function parseMap (JSONmap){
- 	for (var i=0; i<JSONmap["map"].length; i++){
- 		pcoord = metersToPixels([JSONmap["map"][i]["coords"]["x"], JSONmap["map"][i]["coords"]["y"]]);
- 		locationsx.push(pcoord[0]);
- 		locationsy.push(pcoord[1]);
- 		locationsl.push(JSONmap["map"][i]["node-id"]);
- 		for (var j=0; j<JSONmap["map"][i]["connected-to"].length; j++){
- 			connections.push({from:JSONmap["map"][i]["node-id"],to:JSONmap["map"][i]["connected-to"][j]});
- 		} 		 			
- 	}
+ function parseMap (){
+    var JSONmap = actual_JSON;
+    // load origin 
+ 	  origin.push(JSONmap["origin"][0]["x"]); // setting origin of coordinates
+    origin.push(JSONmap["origin"][0]["y"]);
+    // load graph map
+    for (var i=0; i<JSONmap["map"].length; i++){
+ 	  	pcoord = metersToPixels([JSONmap["map"][i]["coords"]["x"], JSONmap["map"][i]["coords"]["y"]]);
+ 	  	locationsx.push(pcoord[0]);
+ 	  	locationsy.push(pcoord[1]);
+ 	  	locationsl.push(JSONmap["map"][i]["node-id"]);
+ 	  	for (var j=0; j<JSONmap["map"][i]["connected-to"].length; j++){
+ 	  		connections.push({from:JSONmap["map"][i]["node-id"],to:JSONmap["map"][i]["connected-to"][j]});
+ 	  	} 		 			
+ 	  }
+    // load walls
+    for (var i=0; i<JSONmap["walls"].length; i++){
+      pcoord1 = metersToPixels([JSONmap["walls"][i]["p1"]["x"], JSONmap["walls"][i]["p1"]["y"]]);
+      pcoord2 = metersToPixels([JSONmap["walls"][i]["p2"]["x"], JSONmap["walls"][i]["p2"]["y"]]);
+      walllocationsx.push(pcoord1[0]);
+      walllocationsy.push(pcoord1[1]);
+      walllocationsx.push(pcoord2[0]);
+      walllocationsy.push(pcoord2[1]);
+    }
+    // load obstacles
+    for (var i=0; i<JSONmap["obstacles"].length; i++){
+      obstacles.push({from:JSONmap["obstacles"][i]["from"], to:JSONmap["obstacles"][i]["to"]});
+      obstaclelabels.push(JSONmap["obstacles"][i]["id"]);
+    }
 
- }
+
+  }
+
 
 function importImage(e){
     var reader = new FileReader();
@@ -303,6 +451,7 @@ function importImage(e){
             origin.push(img.height);
         }
         img.src = event.target.result;
+        document.getElementById("displaybackgroundcheck").checked = true;
     }
     reader.readAsDataURL(e.target.files[0]); 
 
@@ -313,7 +462,13 @@ function importImage(e){
 // =============================================================================
 
 function update(){
-  ctx.drawImage(img,0,0);
+  if (displaybackgroundcheck.checked){
+    ctx.drawImage(img,0,0);
+  }
+  else {
+    ctx.fillStyle = "rgb(255, 255, 255)";
+    ctx.fillRect(0, 0, img.width , img.height);
+  }
   render();
   ctx.fillStyle = "rgb(200, 200, 200)";
   ctx.fillRect(rx-grid_granularity/2, ry-grid_granularity/2, grid_granularity, grid_granularity);
@@ -325,7 +480,9 @@ function render(){
   drawTool();
   drawLocations();
   drawConnections();
+  drawObstacles();
   drawOrigin();
+  drawWalls();
 }
 
 function drawGrid(){
@@ -366,6 +523,12 @@ function drawTool(){
   if (tool==3){
   	strTool= "[set origin]";
   }
+  if (tool==4){
+    strTool= "[draw walls]";
+  }
+  if (tool==5){
+    strTool= "[place obstacles]";
+  }
   ctx.fillText("Tool:"+strTool,10,50);
 }
 
@@ -393,6 +556,25 @@ function drawConnections(){
   for (var i = 0; i < connections.length; i += 1) {
       ctx.moveTo(getCoords(connections[i].from).x , getCoords(connections[i].from).y);
       ctx.lineTo(getCoords(connections[i].to).x, getCoords(connections[i].to).y);
+    }
+  ctx.stroke();
+}
+
+
+function drawObstacles(){
+  for (var i = 0; i < obstacles.length; i += 1) {
+      ctx.drawImage(obstacleicon, Math.floor((getCoords(obstacles[i].from).x+getCoords(obstacles[i].to).x)/2)-Math.floor(grid_granularity/2) , Math.floor((getCoords(obstacles[i].from).y+getCoords(obstacles[i].to).y)/2)-Math.floor(grid_granularity/2));
+    }
+}
+
+
+function drawWalls(){
+  ctx.strokeStyle = '#00ff00';
+  ctx.lineWidth=2;
+  ctx.beginPath();
+  for (var i = 0; i < Math.max(0,walllocationsx.length-1); i += 2) {
+      ctx.moveTo(walllocationsx[i] , walllocationsy[i]);
+      ctx.lineTo(walllocationsx[i+1] , walllocationsy[i+1]);
     }
   ctx.stroke();
 }
