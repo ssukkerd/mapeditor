@@ -375,7 +375,7 @@ function exportMap(el) {
     //var orig = [];
     //orig.push(objo);
 
-    var jsonobj = {map: map, walls: walls, origin: {"x" : ocoord [0]), "y" : ocoord[1]}, "unsafe-rects": [], obstacles: objobstacles };
+    var jsonobj = {map: map, walls: walls, origin: {"x" : ocoord [0],"y" : ocoord[1]}, "unsafe-rects": [], obstacles: objobstacles };
     var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(jsonobj, null, 2));
 
     el.setAttribute("href", "data:"+data);
