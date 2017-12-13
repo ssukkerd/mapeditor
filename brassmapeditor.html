@@ -22,6 +22,8 @@ Usage:
 
 <label>Background map image:&nbsp;</label> 
 <input type="checkbox" title="Display background image" id="displaybackgroundcheck">
+<input type="text" label="m/px" id="mpr" size='6' value='18.5'/>
+<label for='mpr'>m/px</label>
 <input type="file" id="imageLoader" name="imageLoader"/> &nbsp;&nbsp; 
 <label>Map:&nbsp;</label>
 <input type="file" id="mapLoader" name="mapLoader"/>  &nbsp;&nbsp; 
@@ -69,7 +71,7 @@ grid_granularity=5;  // Snap grid cell size
 // Map vars
 // =============================================================================
 
-var MPR = 18.5; // Meter to pixel ratio 
+var MPR = 22; // Meter to pixel ratio 
 var origin=[];
 var locationsx=[], locationsy=[], locationsl=[]; // location coordinates and labels (nodes)
 var connections=[];  // trajectories (arcs)
@@ -116,13 +118,21 @@ function getConnections(label){
 }
 
 function pixelsToMeters(coords){
-	var result = [];
-	return ([((coords[0]-origin[0])/MPR).toFixed(3), ((origin[1]-coords[1])/MPR).toFixed(3)]);
+	var result = ([((coords[0]-origin[0])/MPR).toFixed(3), ((origin[1]-coords[1])/MPR).toFixed(3)]);
+	return result;
 }
 
 function metersToPixels(coords){
 	var result = [];
 	return ([Math.floor(origin[0]+coords[0]*MPR), Math.floor(origin[1]-coords[1]*MPR)]);
+}
+
+function originPixelsToMeters() {
+  return [(origin[0]/MPR).toFixed(3), (origin[1]/MPR).toFixed(3)]
+}
+
+function originMetersToPixels(o) {
+  return [Math.floor(o[0]*MPR), Math.floor(o[1]*MPR)]
 }
 
 
@@ -311,6 +321,7 @@ document.onkeydown = KeyPress;
 
 function exportMap(el) {
     var map = [];
+    MPR = parseFloat(document.getElementById('mpr').value)
 
     for (var i = 0; i < locationsx.length; i ++) {
       var mcoord = pixelsToMeters([locationsx[i], locationsy[i]]);
@@ -336,15 +347,17 @@ function exportMap(el) {
       objobstacles.push(obj);
     }    
 
+    ocoord = originPixelsToMeters()
+    //var objo = {x: origin[0], y: origin[1]}; // origin of coordinates
+    //var orig = [];
+    //orig.push(objo);
 
-    var objo = {x: origin[0], y: origin[1]}; // origin of coordinates
-    var orig = [];
-    orig.push(objo);
-
-    var jsonobj = {map: map, walls: walls, origin: orig, "unsafe-rects": [], obstacles: objobstacles };
+    var jsonobj = {map: map, walls: walls, origin: {"x" : ocoord [0], "y" : ocoord[1]}, "unsafe-rects": [], obstacles: objobstacles };
     var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(jsonobj));
     el.setAttribute("href", "data:"+data);
     el.setAttribute("download", "data.json");    
+
+    map["mpr"] = mpr;
 }
 
 function importMap(e){
@@ -402,9 +415,23 @@ function loadJSON(file, callback) {
 
  function parseMap (){
     var JSONmap = actual_JSON;
+    if (!JSONmap["mpr"]) {
+      MPR = 18.5;
+    }
+    else {
+      MPR = parseFloat(JSONmap["mpr"]);
+    }
     // load origin 
- 	  origin.push(JSONmap["origin"][0]["x"]); // setting origin of coordinates
-    origin.push(JSONmap["origin"][0]["y"]);
+    if (JSONmap["origin"]["x"]) {
+      // new origin format
+      o = [JSONmap["origin"]["x"], JSONmap["origin"]["y"]];
+      origin = originMetersToPixels(o);
+    }
+    else {
+ 	    origin.push(JSONmap["origin"][0]["x"]); // setting origin of coordinates
+      origin.push(JSONmap["origin"][0]["y"]);
+    }
+
     // load graph map
     for (var i=0; i<JSONmap["map"].length; i++){
  	  	pcoord = metersToPixels([JSONmap["map"][i]["coords"]["x"], JSONmap["map"][i]["coords"]["y"]]);
@@ -430,7 +457,7 @@ function loadJSON(file, callback) {
       obstaclelabels.push(JSONmap["obstacles"][i]["id"]);
     }
 
-
+    document.getElementById('mpr').value = MPR
   }
 
 
@@ -475,6 +502,7 @@ function update(){
 }
 
 function render(){
+  MPR = parseFloat(document.getElementById('mpr').value)
   drawGrid();
   drawCoordinates();
   drawTool();
