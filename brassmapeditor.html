@@ -35,6 +35,7 @@ Tools: &nbsp;
 <button type="button" title="Connect waypoints" id="connectTool" name="connectTool" onclick="setToolConnect(this)"><img src="icons/connect.png" width=15 /></button>
 <button type="button" title="Move waypoint" id="moveTool" name="moveTool" onclick="setToolMove(this)"><img src="icons/move.png" width=15 /></button>
 <button type="button" title="Draw walls" id="wallTool" name="wallTool" onclick="setToolWall(this)"><img src="icons/wall.png" width=15 /></button>
+<button type="button" title="Remove walls" id="removeWallTool" disabled name="removeWallTool" onclick="setToolRemoveWall(this)"><img src="icons/removewall.png" width=15 /></button>
 <button type="button" title="Place obstacle" id="obstacleTool" name="obstacleTool" onclick="setToolObstacle(this)"><img src="icons/obstacle.png" width=15 /></button>
 <button type="button" title="Remove obstacle" id="removeObstacleTool" name="removeObstacleTool" onclick="setToolRemoveObstacle(this)"><img src="icons/removeobstacle.png" width=15 /></button>
 <select id="attEdit" name="attEdit">
@@ -86,7 +87,6 @@ var obstacles=[], obstaclelabels=[]; // obstacles associated with arcs
 
 function getLocationAt(x, y){
   for (var i = 0; i < locationsx.length; i ++) {
-//    if (locationsx[i]==x && locationsy[i]==y)
     if (Math.abs(locationsx[i]-x)<=grid_granularity && Math.abs(locationsy[i]-y)<=grid_granularity)
       return locationsl[i];
   }
@@ -118,7 +118,7 @@ function getConnections(label){
 }
 
 function pixelsToMeters(coords){
-	var result = ([((coords[0]-origin[0])/MPR).toFixed(3), ((origin[1]-coords[1])/MPR).toFixed(3)]);
+	var result = ([parseFloat(((coords[0]-origin[0])/MPR).toFixed(3)), parseFloat(((origin[1]-coords[1])/MPR).toFixed(3))]);
 	return result;
 }
 
@@ -128,7 +128,7 @@ function metersToPixels(coords){
 }
 
 function originPixelsToMeters() {
-  return [(origin[0]/MPR).toFixed(3), (origin[1]/MPR).toFixed(3)]
+  return [parseFloat((origin[0]/MPR).toFixed(3)), parseFloat((origin[1]/MPR).toFixed(3))]
 }
 
 function originMetersToPixels(o) {
@@ -153,7 +153,8 @@ function removeObstaclesBetweenLocations (l1, l2){
 // Tool vars
 // =============================================================================
 
-var tool = 0; // tool= 0 create, 1 connect, 2 move, 3 setorigin, 4 Wall, 5 obstacle, 6 remove obstacle
+var tool = 0; // tool= 0 create, 1 connect, 2 move, 3 setorigin, 
+              // 4 Wall, 5 obstacle, 6 remove obstacle, 7 remove wall
 var initStroke, endStroke;   // Location aux vars for tools
 var connecting=false, moving=false;  // Aux var for connection and moving tool
 
@@ -200,6 +201,12 @@ function setToolRemoveObstacle(){
   connecting = false;
   moving = false;
   tool = 6;
+}
+
+function setToolRemoveWall(){
+  connecting = false;
+  moving = false;
+  tool = 7;
 }
 
 // Handles mouse move events
@@ -319,6 +326,16 @@ document.onkeydown = KeyPress;
 // =============================================================================
 
 
+
+//functuion showMap(el){
+//  var json = syntaxHighlight(JSON.stringify(obj,undefined,4);); 
+//  var w = window.open(); 
+//  var html = "<head><style>pre {outline: 1px solid #ccc; padding: 5px; margin: 5px; } .string { color: green; } "; 
+//      html+= " .number { color: darkorange; } .boolean { color: blue; } .null { color: magenta; } .key { color: red; }</style></head><body>"; 
+//      html+= "<pre>"+json+"</pre>"; 
+//  w.document.writeln(html);
+//}
+
 function exportMap(el) {
     var map = [];
     MPR = parseFloat(document.getElementById('mpr').value)
@@ -326,6 +343,8 @@ function exportMap(el) {
     for (var i = 0; i < locationsx.length; i ++) {
       var mcoord = pixelsToMeters([locationsx[i], locationsy[i]]);
       var coord = {x: mcoord[0] , y: mcoord[1]};
+      coord["x"]=parseFloat(coord["x"]);
+      coord["y"]=parseFloat(coord["y"]);
       var obj = {"node-id": locationsl[i], coords:coord, "connected-to":getConnections(locationsl[i])};
       map.push(obj);
     }
@@ -337,6 +356,10 @@ function exportMap(el) {
       var mcoord2 = pixelsToMeters([walllocationsx[i+1], walllocationsy[i+1]]);
       var coord1 = {x: mcoord1[0] , y: mcoord1[1]};
       var coord2 = {x: mcoord2[0] , y: mcoord2[1]};
+      coord1["x"]=parseFloat(coord1["x"]);
+      coord1["y"]=parseFloat(coord1["y"]);
+      coord2["x"]=parseFloat(coord2["x"]);
+      coord2["y"]=parseFloat(coord2["y"]);
       var objw = {"p1": coord1, "p2": coord2 };
       walls.push(objw);
     }
@@ -352,8 +375,9 @@ function exportMap(el) {
     //var orig = [];
     //orig.push(objo);
 
-    var jsonobj = {map: map, walls: walls, origin: {"x" : ocoord [0], "y" : ocoord[1]}, "unsafe-rects": [], obstacles: objobstacles };
-    var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(jsonobj));
+    var jsonobj = {map: map, walls: walls, origin: {"x" : ocoord [0]), "y" : ocoord[1]}, "unsafe-rects": [], obstacles: objobstacles };
+    var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(jsonobj, null, 2));
+
     el.setAttribute("href", "data:"+data);
     el.setAttribute("download", "data.json");    
 
