@@ -370,18 +370,19 @@ function exportMap(el) {
       objobstacles.push(obj);
     }    
 
-    ocoord = originPixelsToMeters()
+  ocoord = originPixelsToMeters()
+
+
     //var objo = {x: origin[0], y: origin[1]}; // origin of coordinates
     //var orig = [];
     //orig.push(objo);
 
-    var jsonobj = {map: map, walls: walls, origin: {"x" : ocoord [0],"y" : ocoord[1]}, "unsafe-rects": [], obstacles: objobstacles };
+    var jsonobj = {mpr : MPR, map: map, walls: walls, origin: {"x" : ocoord [0],"y" : ocoord[1]}, "unsafe-rects": [], obstacles: objobstacles };
     var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(jsonobj, null, 2));
 
     el.setAttribute("href", "data:"+data);
     el.setAttribute("download", "data.json");    
 
-    map["mpr"] = mpr;
 }
 
 function importMap(e){
