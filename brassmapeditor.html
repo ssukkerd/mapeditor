@@ -21,7 +21,7 @@ Usage:
 -->
 
 <label>Background map image:&nbsp;</label> 
-<input type="checkbox" title="Display background image" id="displaybackgroundcheck">
+
 <input type="text" label="m/px" id="mpr" size='6' value='18.5'/>
 <label for='mpr'>m/px</label>
 <input type="file" id="imageLoader" name="imageLoader"/> &nbsp;&nbsp; 
@@ -38,10 +38,15 @@ Tools: &nbsp;
 <button type="button" title="Remove walls" id="removeWallTool" disabled name="removeWallTool" onclick="setToolRemoveWall(this)"><img src="icons/removewall.png" width=15 /></button>
 <button type="button" title="Place obstacle" id="obstacleTool" name="obstacleTool" onclick="setToolObstacle(this)"><img src="icons/obstacle.png" width=15 /></button>
 <button type="button" title="Remove obstacle" id="removeObstacleTool" name="removeObstacleTool" onclick="setToolRemoveObstacle(this)"><img src="icons/removeobstacle.png" width=15 /></button>
+<button type="button" title="Place light" id="placeLightTool" name="placeLightTool" onclick="setToolPlaceLight(this)"><img src="icons/lightbulb.png" width=15 /></button>
 <select id="attEdit" name="attEdit">
   <option value="o1"> Obstacle type 1</option>
   <option value="o2"> Obstacle type 2</option>
 </select>
+Display: 
+<input type="checkbox" title="Display background" id="displaybackgroundcheck"> Background
+<input type="checkbox" title="Display lights" id="displaylightscheck" checked> Lights
+
 <canvas id="imageCanvas"></canvas>
 <script>
 
@@ -63,6 +68,9 @@ var img =null;
 var obstacleicon = new Image();
 obstacleicon.src = "/icons/obstacle.png";
 
+var lighticon = new Image();
+lighticon.src = "/icons/lightbulb.png";
+
 rx=ry=0;  // current cursor position
 v=3;
 
@@ -78,6 +86,7 @@ var locationsx=[], locationsy=[], locationsl=[]; // location coordinates and lab
 var connections=[];  // trajectories (arcs)
 var walllocationsx=[], walllocationsy=[]; // wall location coordinates
 var obstacles=[], obstaclelabels=[]; // obstacles associated with arcs
+var lightsx=[], lightsy=[], lightids=[]; // Lights
 
 // =============================================================================
 // Map querying (checking locations at x,y position, etc.)
@@ -149,12 +158,20 @@ function removeObstaclesBetweenLocations (l1, l2){
   obstaclelabels = auxobstaclelabels;
 }
 
+function createLightsOnWaypoints(){
+  for (var i=0; i<locationsx.length;i+=1){
+    lightsx.push(locationsx[i]);
+    lightsy.push(locationsy[i]);
+      lightids.push("light"+lightids.length.toString());
+  }
+}
+
 // =============================================================================
 // Tool vars
 // =============================================================================
 
 var tool = 0; // tool= 0 create, 1 connect, 2 move, 3 setorigin, 
-              // 4 Wall, 5 obstacle, 6 remove obstacle, 7 remove wall
+              // 4 Wall, 5 obstacle, 6 remove obstacle, 7 remove wall, 8 place light
 var initStroke, endStroke;   // Location aux vars for tools
 var connecting=false, moving=false;  // Aux var for connection and moving tool
 
@@ -207,6 +224,12 @@ function setToolRemoveWall(){
   connecting = false;
   moving = false;
   tool = 7;
+}
+
+function setToolPlaceLight(){
+  connecting = false;
+  moving = false;
+  tool = 8;
 }
 
 // Handles mouse move events
@@ -302,6 +325,11 @@ function clickReporter(e){
     }
   }
 
+  if (tool==8){ // Creating lights
+    lightsx.push(rx);
+    lightsy.push(ry);
+    lightids.push("light"+lightids.length.toString());
+    }
 }
 
 // Keyboard handling
@@ -312,10 +340,25 @@ function KeyPress(e) {
       walllocationsx.splice(-2,2);
       walllocationsy.splice(-2,2); 
     }
+
+  if (tool==8){ // undo last light
+      lightsx.splice(-1,1);
+      lightsy.splice(-1,1);
+      lightids.splice(-1,1);
+    }
+
   }
 
   if (evtobj.keyCode == 66 && evtobj.ctrlKey) { // toggle background image display (ctrl+b)
     displaybackgroundcheck.checked = !displaybackgroundcheck.checked;
+  }
+
+  if (evtobj.keyCode == 76 && evtobj.ctrlKey) { // toggle lights display (ctrl+l)
+    displaylightscheck.checked = !displaylightscheck.checked;
+  }
+
+  if (evtobj.keyCode == 81 && evtobj.ctrlKey) { // Create lights on all waypoints (ctrl+q)
+    createLightsOnWaypoints();
   }
 }
 document.onkeydown = KeyPress;
@@ -324,17 +367,6 @@ document.onkeydown = KeyPress;
 // =============================================================================
 // Import/Export of Map Data (JSON) and BG map image
 // =============================================================================
-
-
-
-//functuion showMap(el){
-//  var json = syntaxHighlight(JSON.stringify(obj,undefined,4);); 
-//  var w = window.open(); 
-//  var html = "<head><style>pre {outline: 1px solid #ccc; padding: 5px; margin: 5px; } .string { color: green; } "; 
-//      html+= " .number { color: darkorange; } .boolean { color: blue; } .null { color: magenta; } .key { color: red; }</style></head><body>"; 
-//      html+= "<pre>"+json+"</pre>"; 
-//  w.document.writeln(html);
-//}
 
 function exportMap(el) {
     var map = [];
@@ -370,19 +402,20 @@ function exportMap(el) {
       objobstacles.push(obj);
     }    
 
-  ocoord = originPixelsToMeters()
+  var objlights=[];
+  for (var i = 0; i < lightids.length; i ++) {
+      var lcoord = pixelsToMeters([lightsx[i].toFixed(3), lightsy[i].toFixed(3)]);
+      var obj = {"light-id": lightids[i], "coord": { "x": parseFloat(lcoord[0]), "y": parseFloat(lcoord[1])} };
+      objlights.push(obj);
+    }    
+  
+    ocoord = originPixelsToMeters()
 
-
-    //var objo = {x: origin[0], y: origin[1]}; // origin of coordinates
-    //var orig = [];
-    //orig.push(objo);
-
-    var jsonobj = {mpr : MPR, map: map, walls: walls, origin: {"x" : ocoord [0],"y" : ocoord[1]}, "unsafe-rects": [], obstacles: objobstacles };
+    var jsonobj = {mpr : MPR, map: map, walls: walls, origin: {"x" : ocoord [0],"y" : ocoord[1]}, "unsafe-rects": [], obstacles: objobstacles, lights: objlights};
     var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(jsonobj, null, 2));
 
     el.setAttribute("href", "data:"+data);
     el.setAttribute("download", "data.json");    
-
 }
 
 function importMap(e){
@@ -436,6 +469,9 @@ function loadJSON(file, callback) {
   walllocationsx=[];
   walllocationsy=[];
  	connections = [];
+  lightsx = [];
+  lightsy = [];
+  lightids = [];
  }
 
  function parseMap (){
@@ -453,8 +489,8 @@ function loadJSON(file, callback) {
       origin = originMetersToPixels(o);
     }
     else {
- 	    origin.push(JSONmap["origin"][0]["x"]); // setting origin of coordinates
-      origin.push(JSONmap["origin"][0]["y"]);
+      origin.push(JSONmap["origin"]["x"]); // setting origin of coordinates
+      origin.push(JSONmap["origin"]["y"]);
     }
 
     // load graph map
@@ -468,20 +504,32 @@ function loadJSON(file, callback) {
  	  	} 		 			
  	  }
     // load walls
-    for (var i=0; i<JSONmap["walls"].length; i++){
-      pcoord1 = metersToPixels([JSONmap["walls"][i]["p1"]["x"], JSONmap["walls"][i]["p1"]["y"]]);
-      pcoord2 = metersToPixels([JSONmap["walls"][i]["p2"]["x"], JSONmap["walls"][i]["p2"]["y"]]);
-      walllocationsx.push(pcoord1[0]);
-      walllocationsy.push(pcoord1[1]);
-      walllocationsx.push(pcoord2[0]);
-      walllocationsy.push(pcoord2[1]);
+    if (JSONmap["walls"]){
+      for (var i=0; i<JSONmap["walls"].length; i++){
+       pcoord1 = metersToPixels([JSONmap["walls"][i]["p1"]["x"], JSONmap["walls"][i]["p1"]["y"]]);
+       pcoord2 = metersToPixels([JSONmap["walls"][i]["p2"]["x"], JSONmap["walls"][i]["p2"]["y"]]);
+       walllocationsx.push(pcoord1[0]);
+       walllocationsy.push(pcoord1[1]);
+       walllocationsx.push(pcoord2[0]);
+       walllocationsy.push(pcoord2[1]);
+      }
     }
     // load obstacles
-    for (var i=0; i<JSONmap["obstacles"].length; i++){
-      obstacles.push({from:JSONmap["obstacles"][i]["from"], to:JSONmap["obstacles"][i]["to"]});
-      obstaclelabels.push(JSONmap["obstacles"][i]["id"]);
+    if (JSONmap["obstacles"]){
+      for (var i=0; i<JSONmap["obstacles"].length; i++){
+       obstacles.push({from:JSONmap["obstacles"][i]["from"], to:JSONmap["obstacles"][i]["to"]});
+       obstaclelabels.push(JSONmap["obstacles"][i]["id"]);
+     }
     }
-
+    // load lights
+    if (JSONmap["lights"]){
+      for (var i=0; i<JSONmap["lights"].length; i++){
+       var lcoord=metersToPixels([JSONmap["lights"][i]["coord"]["x"], JSONmap["lights"][i]["coord"]["y"]]);
+       lightsx.push(lcoord[0]);
+       lightsy.push(lcoord[1]);
+       lightids.push(JSONmap["lights"][i]["light-id"]);
+      }
+    }
     document.getElementById('mpr').value = MPR
   }
 
@@ -536,6 +584,8 @@ function render(){
   drawObstacles();
   drawOrigin();
   drawWalls();
+  if (displaylightscheck.checked)
+    drawLights();
 }
 
 function drawGrid(){
@@ -582,6 +632,9 @@ function drawTool(){
   if (tool==5){
     strTool= "[place obstacles]";
   }
+  if (tool==8){
+    strTool= "[place lights]";
+  }
   ctx.fillText("Tool:"+strTool,10,50);
 }
 
@@ -620,6 +673,14 @@ function drawObstacles(){
     }
 }
 
+function drawLights(){
+  for (var i = 0; i < lightids.length; i += 1) {
+      ctx.drawImage(lighticon, lightsx[i]-Math.floor(grid_granularity/2) , lightsy[i]-Math.floor(grid_granularity/2));
+      ctx.fillStyle = "rgb(0, 0, 0)";
+      ctx.font="10px Georgia";
+      ctx.fillText(lightids[i],lightsx[i]+grid_granularity/2+lighticon.width,lightsy[i]+grid_granularity);
+    }
+}
 
 function drawWalls(){
   ctx.strokeStyle = '#00ff00';
