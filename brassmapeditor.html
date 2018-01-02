@@ -46,6 +46,7 @@ Tools: &nbsp;
 Display: 
 <input type="checkbox" title="Display background" id="displaybackgroundcheck"> Background
 <input type="checkbox" title="Display lights" id="displaylightscheck" checked> Lights
+<input type="checkbox" title="Display initial points" id="displayinitialpointscheck" checked> Initial points
 
 <canvas id="imageCanvas"></canvas>
 <script>
@@ -87,6 +88,8 @@ var connections=[];  // trajectories (arcs)
 var walllocationsx=[], walllocationsy=[]; // wall location coordinates
 var obstacles=[], obstaclelabels=[]; // obstacles associated with arcs
 var lightsx=[], lightsy=[], lightids=[]; // Lights
+var ipointsx=[], ipointsy=[]; // Initial points grid
+var IPS = 2 * grid_granularity; // Separation between initial points in grid
 
 // =============================================================================
 // Map querying (checking locations at x,y position, etc.)
@@ -145,6 +148,36 @@ function originMetersToPixels(o) {
 }
 
 
+function coordsWithinWalls (x, y){
+/*  var wlx=[], wly = [];
+  var i=1;
+  wlx.push(walllocationsx[0]);
+  wly.push(walllocationsy[0]);  
+  while (((walllocationsx[i]!=walllocationsx[0]) && (walllocationsy[i]!=walllocationsy[0])) || (i<walllocationsx.length)){
+    wlx.push(walllocationsx[0]);
+    wly.push(walllocationsy[0]);  
+    i=i+1;
+  }
+  if (wlx.length>0)
+    console.log(wlx.length);*/
+  return coordsWithinPolygon (x, y, walllocationsx, walllocationsy);
+}
+
+function coordsWithinPolygon (x, y, cornersX, cornersY) {
+  var i, j=cornersX.length-1 ;
+  var  oddNodes=false;
+  var polyX = cornersX;
+  var polyY = cornersY;
+
+  for (i=0; i<cornersX.length; i++) {
+     if ((polyY[i]< y && polyY[j]>=y ||  polyY[j]< y && polyY[i]>=y) &&  (polyX[i]<=x || polyX[j]<=x)) {
+        oddNodes^=(polyX[i]+(y-polyY[i])/(polyY[j]-polyY[i])*(polyX[j]-polyX[i])<x); 
+      }
+      j=i; 
+  }
+  return oddNodes;
+}
+
 function removeObstaclesBetweenLocations (l1, l2){
   var auxobstacles=[];
   var auxobstaclelabels=[];
@@ -164,6 +197,17 @@ function createLightsOnWaypoints(){
     lightsy.push(locationsy[i]);
       lightids.push("light"+lightids.length.toString());
   }
+}
+
+function createInitialPoints(){
+  ipointsx=[];
+  ipointsy=[];
+  for (var i = grid_granularity; i < canvas.height; i += IPS)
+    for (var j = grid_granularity; j < canvas.width; j += IPS)
+      if (coordsWithinWalls(j,i)){
+        ipointsx.push(j);
+        ipointsy.push(i);
+      }
 }
 
 // =============================================================================
@@ -360,6 +404,10 @@ function KeyPress(e) {
   if (evtobj.keyCode == 81 && evtobj.ctrlKey) { // Create lights on all waypoints (ctrl+q)
     createLightsOnWaypoints();
   }
+
+  if (evtobj.keyCode == 73 && evtobj.ctrlKey) { // Create initial points grid (ctrl+i)
+    createInitialPoints();
+  }
 }
 document.onkeydown = KeyPress;
 
@@ -411,7 +459,14 @@ function exportMap(el) {
   
     ocoord = originPixelsToMeters()
 
-    var jsonobj = {mpr : MPR, map: map, walls: walls, origin: {"x" : ocoord [0],"y" : ocoord[1]}, "unsafe-rects": [], obstacles: objobstacles, lights: objlights};
+  var objipoints=[];
+  for (var i = 0; i < ipointsx.length; i ++) {
+      var lcoord = pixelsToMeters([ipointsx[i].toFixed(3), ipointsy[i].toFixed(3)]);
+      var obj = {"x": parseFloat(lcoord[0]), "y": parseFloat(lcoord[1])};
+      objipoints.push(obj);
+    }    
+
+    var jsonobj = {mpr : MPR, map: map, walls: walls, origin: {"x" : ocoord [0],"y" : ocoord[1]}, "unsafe-rects": [], obstacles: objobstacles, lights: objlights, "initial-points": objipoints};
     var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(jsonobj, null, 2));
 
     el.setAttribute("href", "data:"+data);
@@ -586,7 +641,10 @@ function render(){
   drawWalls();
   if (displaylightscheck.checked)
     drawLights();
+  if (displayinitialpointscheck.checked)
+    drawInitialPoints();
 }
+
 
 function drawGrid(){
 	ctx.strokeStyle = '#cccccc';
@@ -645,6 +703,13 @@ function drawLocations(){
     ctx.fillStyle = "rgb(0, 0, 0)";
     ctx.font="10px Georgia";
     ctx.fillText(locationsl[i],locationsx[i]+grid_granularity,locationsy[i]+grid_granularity);
+  }
+}
+
+function drawInitialPoints(){
+  ctx.fillStyle = "rgba(0, 0, 200 ,0.3)";
+  for (var i = 0; i < ipointsx.length; i ++) {
+      ctx.fillRect(ipointsx[i]-grid_granularity/2, ipointsy[i]-grid_granularity/2, grid_granularity, grid_granularity);
   }
 }
 
