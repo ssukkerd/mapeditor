@@ -35,7 +35,7 @@ Tools: &nbsp;
 <button type="button" title="Connect waypoints" id="connectTool" name="connectTool" onclick="setToolConnect(this)"><img src="icons/connect.png" width=15 /></button>
 <button type="button" title="Move waypoint" id="moveTool" name="moveTool" onclick="setToolMove(this)"><img src="icons/move.png" width=15 /></button>
 <button type="button" title="Draw walls" id="wallTool" name="wallTool" onclick="setToolWall(this)"><img src="icons/wall.png" width=15 /></button>
-<button type="button" title="Remove walls" id="removeWallTool" disabled name="removeWallTool" onclick="setToolRemoveWall(this)"><img src="icons/removewall.png" width=15 /></button>
+<button type="button" title="Remove walls" id="removeWallTool" name="removeWallTool" onclick="setToolRemoveWall(this)"><img src="icons/removewall.png" width=15 /></button>
 <button type="button" title="Place obstacle" id="obstacleTool" name="obstacleTool" onclick="setToolObstacle(this)"><img src="icons/obstacle.png" width=15 /></button>
 <button type="button" title="Remove obstacle" id="removeObstacleTool" name="removeObstacleTool" onclick="setToolRemoveObstacle(this)"><img src="icons/removeobstacle.png" width=15 /></button>
 <button type="button" title="Place light" id="placeLightTool" name="placeLightTool" onclick="setToolPlaceLight(this)"><img src="icons/lightbulb.png" width=15 /></button>
@@ -176,6 +176,41 @@ function coordsWithinPolygon (x, y, cornersX, cornersY) {
       j=i; 
   }
   return oddNodes;
+}
+
+function coordsOnLine(x, y, sx, sy, ex, ey) {
+
+  tolerance = 3
+  var L2 = ( ((ex-sx) * (ex-sx)) + ((ey-sy) * (ey-sy)));
+  if (L2 == 0) return false;
+  var r = (((x - sx) * (ex - sx)) + ((y - sy) * (ey - sy)))/L2;
+  if (r < 0) {
+    return (Math.sqrt(((sx - x) * (sx - x)) + ((sy - y) * (sy -y))) <= tolerance)
+  }
+  else if ((0 <= r) && (r <= 1)) {
+    var s = (((sy - y) * (ex - sx)) - ((sx - x) * (ey - sy))) / L2;
+    return (Math.abs(s) * Math.sqrt(L2) < tolerance);
+  }
+  else {
+    return (Math.sqrt(((ex - x) * (ex-x)) + ((ey -y) * (ey-y))) <= tolerance);
+  }
+
+}
+
+function removeWallAt(px, py) {
+  var wlx = [], wly = [];
+  var i = 1;
+  while (i < walllocationsx.length) {
+    if (!coordsOnLine(px,py, walllocationsx[i-1], walllocationsy[i-1], walllocationsx[i], walllocationsy[i])) {
+      wlx.push(walllocationsx[i-1])
+      wlx.push(walllocationsx[i])
+      wly.push(walllocationsy[i-1])
+      wly.push(walllocationsy[i])
+    }
+    i = i + 2;
+  }
+  walllocationsx = wlx;
+  walllocationsy = wly;
 }
 
 function removeObstaclesBetweenLocations (l1, l2){
@@ -369,6 +404,10 @@ function clickReporter(e){
     }
   }
 
+  if (tool==7) {
+    removeWallAt(rx, ry);
+  }
+
   if (tool==8){ // Creating lights
     lightsx.push(rx);
     lightsy.push(ry);
@@ -401,7 +440,7 @@ function KeyPress(e) {
     displaylightscheck.checked = !displaylightscheck.checked;
   }
 
-  if (evtobj.keyCode == 81 && evtobj.ctrlKey) { // Create lights on all waypoints (ctrl+q)
+  if (evtobj.keyCode == 81 /*&& evtobj.ctrlKey*/) { // Create lights on all waypoints (ctrl+q)
     createLightsOnWaypoints();
   }
 
