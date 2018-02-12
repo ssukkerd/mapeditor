@@ -39,6 +39,7 @@ Tools: &nbsp;
 <button type="button" title="Place obstacle" id="obstacleTool" name="obstacleTool" onclick="setToolObstacle(this)"><img src="icons/obstacle.png" width=15 /></button>
 <button type="button" title="Remove obstacle" id="removeObstacleTool" name="removeObstacleTool" onclick="setToolRemoveObstacle(this)"><img src="icons/removeobstacle.png" width=15 /></button>
 <button type="button" title="Place light" id="placeLightTool" name="placeLightTool" onclick="setToolPlaceLight(this)"><img src="icons/lightbulb.png" width=15 /></button>
+<button type="button" title="Toggle charging station" id="toggleChargingTool" name="toggleChargingTool" onclick="setToolToggleCharging(this)"><img src="icons/battery.png" width=15 /></button>
 <select id="attEdit" name="attEdit">
   <option value="o1"> Obstacle type 1</option>
   <option value="o2"> Obstacle type 2</option>
@@ -46,7 +47,7 @@ Tools: &nbsp;
 Display: 
 <input type="checkbox" title="Display background" id="displaybackgroundcheck"> Background
 <input type="checkbox" title="Display lights" id="displaylightscheck" checked> Lights
-<input type="checkbox" title="Display initial points" id="displayinitialpointscheck" checked> Initial points
+<!-- <input type="checkbox" title="Display initial points" id="displayinitialpointscheck" checked> Initial points -->
 
 <canvas id="imageCanvas"></canvas>
 <script>
@@ -72,6 +73,10 @@ obstacleicon.src = "/icons/obstacle.png";
 var lighticon = new Image();
 lighticon.src = "/icons/lightbulb.png";
 
+var batteryicon = new Image();
+batteryicon.src = "/icons/battery.png";
+
+
 rx=ry=0;  // current cursor position
 v=3;
 
@@ -90,6 +95,7 @@ var obstacles=[], obstaclelabels=[]; // obstacles associated with arcs
 var lightsx=[], lightsy=[], lightids=[]; // Lights
 var ipointsx=[], ipointsy=[]; // Initial points grid
 var IPS = 2 * grid_granularity; // Separation between initial points in grid
+var stations=[]; // charging stations
 
 // =============================================================================
 // Map querying (checking locations at x,y position, etc.)
@@ -251,6 +257,7 @@ function createInitialPoints(){
 
 var tool = 0; // tool= 0 create, 1 connect, 2 move, 3 setorigin, 
               // 4 Wall, 5 obstacle, 6 remove obstacle, 7 remove wall, 8 place light
+              // 9 toggle charging station
 var initStroke, endStroke;   // Location aux vars for tools
 var connecting=false, moving=false;  // Aux var for connection and moving tool
 
@@ -309,6 +316,12 @@ function setToolPlaceLight(){
   connecting = false;
   moving = false;
   tool = 8;
+}
+
+function setToolToggleCharging(){
+  connecting = false;
+  moving = false;
+  tool = 9;
 }
 
 // Handles mouse move events
@@ -413,7 +426,21 @@ function clickReporter(e){
     lightsy.push(ry);
     lightids.push("light"+lightids.length.toString());
     }
+
+  if (tool==9) { // Toggle charging station on location
+    var sloc = getLocationAt(rx,ry); 
+    if (locationsl.indexOf(sloc) >= 0) { // If location at mouse pointer 
+     if (stations.indexOf(sloc) >= 0){  
+        stations.splice(stations.indexOf(sloc),1); // If it is a charging station, remove it from charging station list
+      } else {
+        stations.push(sloc); // Otherwise, add it to charging stations
+      }
+    } // If no location at mouse pointer, do nothing
+  }
 }
+
+
+
 
 // Keyboard handling
 function KeyPress(e) {
@@ -505,7 +532,7 @@ function exportMap(el) {
       objipoints.push(obj);
     }    
 
-    var jsonobj = {mpr : MPR, map: map, walls: walls, origin: {"x" : ocoord [0],"y" : ocoord[1]}, "unsafe-rects": [], obstacles: objobstacles, lights: objlights, "initial-points": objipoints};
+    var jsonobj = {mpr : MPR, map: map, walls: walls, origin: {"x" : ocoord [0],"y" : ocoord[1]}, "unsafe-rects": [], obstacles: objobstacles, lights: objlights, "stations": stations, "initial-points": objipoints};
     var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(jsonobj, null, 2));
 
     el.setAttribute("href", "data:"+data);
@@ -624,6 +651,13 @@ function loadJSON(file, callback) {
        lightids.push(JSONmap["lights"][i]["light-id"]);
       }
     }
+
+    // load  stations
+    if (JSONmap["stations"]){
+      for (var i=0; i<JSONmap["stations"].length; i++){
+        stations.push(JSONmap["stations"][i]);
+      }   
+    }
     document.getElementById('mpr').value = MPR
   }
 
@@ -680,8 +714,8 @@ function render(){
   drawWalls();
   if (displaylightscheck.checked)
     drawLights();
-  if (displayinitialpointscheck.checked)
-    drawInitialPoints();
+//  if (displayinitialpointscheck.checked)
+//    drawInitialPoints();
 }
 
 
@@ -742,6 +776,9 @@ function drawLocations(){
     ctx.fillStyle = "rgb(0, 0, 0)";
     ctx.font="10px Georgia";
     ctx.fillText(locationsl[i],locationsx[i]+grid_granularity,locationsy[i]+grid_granularity);
+    if (stations.indexOf(locationsl[i])>=0){
+       ctx.drawImage(batteryicon, locationsx[i]-batteryicon.width-Math.floor(grid_granularity/2) , locationsy[i]-Math.floor(grid_granularity/2));
+    }
   }
 }
 
