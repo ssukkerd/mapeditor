@@ -135,6 +135,10 @@ function getConnections(label){
   return result;
 }
 
+function locationsConnected(l1,l2){
+  return (getConnections(l1).indexOf(l2)>=0);
+}
+
 function pixelsToMeters(coords){
 	var result = ([parseFloat(((coords[0]-origin[0])/MPR).toFixed(3)), parseFloat(((origin[1]-coords[1])/MPR).toFixed(3))]);
 	return result;
@@ -355,7 +359,7 @@ function clickReporter(e){
       }
     } else {   // If finishing a connection (selecting end node)
       endStroke = getLocationAt(rx,ry);
-      if (endStroke!=""){
+      if (endStroke!="" && endStroke!=initStroke && !locationsConnected(initStroke,endStroke)){
         connecting = false;
         connections.push({from:initStroke,to:endStroke}); // Connections are bidirectional
         connections.push({from:endStroke,to:initStroke});
