@@ -32,7 +32,9 @@ Usage:
 Tools: &nbsp; 
 <button type="button" title="Set origin of coordinates" id="setOriginTool" name="setOriginTool" onclick="setToolOrigin(this)"><img src="icons/origin.png" width=15 /></button>
 <button type="button" title="Create waypoint" id="createTool" name="createTool" onclick="setToolCreate(this)"><img src="icons/location.png" width=15 /></button>
+<button type="button" title="Remove waypoint" id="removeTool" name="removeTool" onclick="setToolRemove(this)"><img src="icons/removelocation.png" width=15 /></button>
 <button type="button" title="Connect waypoints" id="connectTool" name="connectTool" onclick="setToolConnect(this)"><img src="icons/connect.png" width=15 /></button>
+<button type="button" title="Disconnect waypoints" id="disconnectTool" name="disconnectTool" onclick="setToolDisconnect(this)"><img src="icons/removeconnect.png" width=15 /></button>
 <button type="button" title="Move waypoint" id="moveTool" name="moveTool" onclick="setToolMove(this)"><img src="icons/move.png" width=15 /></button>
 <button type="button" title="Draw walls" id="wallTool" name="wallTool" onclick="setToolWall(this)"><img src="icons/wall.png" width=15 /></button>
 <button type="button" title="Remove walls" id="removeWallTool" name="removeWallTool" onclick="setToolRemoveWall(this)"><img src="icons/removewall.png" width=15 /></button>
@@ -223,6 +225,22 @@ function removeWallAt(px, py) {
   walllocationsy = wly;
 }
 
+function removeConnectionAt(px, py) {
+  var newconns=[]
+  console.log("removeconnat "+px.toString()+" "+py.toString())
+
+  for (var i=0; i<connections.length; i++){
+    if (!coordsOnLine(px, py, getCoords(connections[i].from).x, 
+                              getCoords(connections[i].from).y,
+                              getCoords(connections[i].to).x,
+                              getCoords(connections[i].to).y )){
+      newconns.push(connections[i]);
+    }
+  }
+  connections = newconns;
+}
+
+
 function removeObstaclesBetweenLocations (l1, l2){
   var auxobstacles=[];
   var auxobstaclelabels=[];
@@ -261,7 +279,7 @@ function createInitialPoints(){
 
 var tool = 0; // tool= 0 create, 1 connect, 2 move, 3 setorigin, 
               // 4 Wall, 5 obstacle, 6 remove obstacle, 7 remove wall, 8 place light
-              // 9 toggle charging station
+              // 9 toggle charging station, 10 disconnect waypoints, 11 remove waypoints
 var initStroke, endStroke;   // Location aux vars for tools
 var connecting=false, moving=false;  // Aux var for connection and moving tool
 
@@ -328,6 +346,18 @@ function setToolToggleCharging(){
   tool = 9;
 }
 
+function setToolDisconnect(){
+  connecting = false;
+  moving = false;
+  tool = 10;
+}
+
+function setToolRemove(){
+  connecting = false;
+  moving = false;
+  tool = 11;
+}
+
 // Handles mouse move events
 function moveReporter(e){
   ex = e.pageX-10;
@@ -349,6 +379,7 @@ function clickReporter(e){
     locationsx.push(rx);
     locationsy.push(ry);
     locationsl.push("l"+locationsx.length.toString());
+    console.log("l"+locationsx.length.toString()+" created.")
     }
 
   if (tool==1){ // Creating connections between locations
@@ -441,6 +472,23 @@ function clickReporter(e){
       }
     } // If no location at mouse pointer, do nothing
   }
+
+  if (tool==10){ // Remove connection between waypoints
+    removeConnectionAt(rx,ry);
+  }
+
+  if (tool==11){ // Eliminate waypoint
+    var sloc = getLocationAt(rx,ry)
+    slocidx=locationsl.indexOf(sloc)
+    if (slocidx>=0){
+      if (getConnections(sloc).length==0){ // Removed only if waypoint not connected to any other waypoint
+        locationsx.splice(slocidx,1);
+        locationsy.splice(slocidx,1);
+        locationsl.splice(slocidx,1);
+      }
+    }
+  }
+
 }
 
 
@@ -770,6 +818,16 @@ function drawTool(){
   if (tool==8){
     strTool= "[place lights]";
   }
+  if (tool==9){
+    strTool = "[toggle charging station]"
+  }
+  if (tool==10){
+    strTool = "[disconnect waypoints]"
+  }
+  if (tool==11){
+    strTool = "[remove waypoints]"
+  }
+
   ctx.fillText("Tool:"+strTool,10,50);
 }
 
