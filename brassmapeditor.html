@@ -38,6 +38,7 @@ Tools: &nbsp;
 <button type="button" title="Move waypoint" id="moveTool" name="moveTool" onclick="setToolMove(this)"><img src="icons/move.png" width=15 /></button>
 <button type="button" title="Draw walls" id="wallTool" name="wallTool" onclick="setToolWall(this)"><img src="icons/wall.png" width=15 /></button>
 <button type="button" title="Remove walls" id="removeWallTool" name="removeWallTool" onclick="setToolRemoveWall(this)"><img src="icons/removewall.png" width=15 /></button>
+<button type="button" title="Place obstacle Info" id="obstacleInfoTool" name="obstacleInfoTool" onclick="setToolInfoObstacle(this)"><img src="icons/obstacle.png" width=15 /></button>
 <button type="button" title="Place obstacle" id="obstacleTool" name="obstacleTool" onclick="setToolObstacle(this)"><img src="icons/obstacle.png" width=15 /></button>
 <button type="button" title="Remove obstacle" id="removeObstacleTool" name="removeObstacleTool" onclick="setToolRemoveObstacle(this)"><img src="icons/removeobstacle.png" width=15 /></button>
 <button type="button" title="Place light" id="placeLightTool" name="placeLightTool" onclick="setToolPlaceLight(this)"><img src="icons/lightbulb.png" width=15 /></button>
@@ -98,6 +99,7 @@ var lightsx=[], lightsy=[], lightids=[]; // Lights
 var ipointsx=[], ipointsy=[]; // Initial points grid
 var IPS = 2 * grid_granularity; // Separation between initial points in grid
 var stations=[]; // charging stations
+var worldobstaclesx=[], worldobstaclesy=[]; // x,y obstacles 0.5x05m in world
 
 // =============================================================================
 // Map querying (checking locations at x,y position, etc.)
@@ -279,7 +281,8 @@ function createInitialPoints(){
 
 var tool = 0; // tool= 0 create, 1 connect, 2 move, 3 setorigin, 
               // 4 Wall, 5 obstacle, 6 remove obstacle, 7 remove wall, 8 place light
-              // 9 toggle charging station, 10 disconnect waypoints, 11 remove waypoints
+              // 9 toggle charging station, 10 disconnect waypoints, 11 remove waypoints,
+              // 12 place rewal world obstacle
 var initStroke, endStroke;   // Location aux vars for tools
 var connecting=false, moving=false;  // Aux var for connection and moving tool
 
@@ -316,7 +319,7 @@ function setToolWall(){
   tool = 4;
 }
 
-function setToolObstacle(){
+function setToolInfoObstacle(){
   connecting = false;
   moving = false;
   tool = 5;
@@ -356,6 +359,12 @@ function setToolRemove(){
   connecting = false;
   moving = false;
   tool = 11;
+}
+
+function setToolObstacle(){
+  connecting = false;
+  moving = false;
+  tool = 12;
 }
 
 // Handles mouse move events
@@ -489,6 +498,11 @@ function clickReporter(e){
     }
   }
 
+  if (tool==12){ // Place real world obstacle
+    worldobstaclesx.push(rx);
+    worldobstaclesy.push(ry);
+  }
+
 }
 
 
@@ -584,7 +598,14 @@ function exportMap(el) {
       objipoints.push(obj);
     }    
 
-    var jsonobj = {mpr : MPR, map: map, walls: walls, origin: {"x" : ocoord [0],"y" : ocoord[1]}, "unsafe-rects": [], obstacles: objobstacles, lights: objlights, "stations": stations, "initial-points": objipoints};
+  var objwobstacles=[];
+  for (var i = 0; i < worldobstaclesx.length; i ++) {
+      var lcoord = pixelsToMeters([worldobstaclesx[i].toFixed(3), worldobstaclesy[i].toFixed(3)]);
+      var obj = {"x": parseFloat(lcoord[0]), "y": parseFloat(lcoord[1])};
+      objwobstacles.push(obj);
+    }    
+
+    var jsonobj = {mpr : MPR, map: map, walls: walls, origin: {"x" : ocoord [0],"y" : ocoord[1]}, "unsafe-rects": [], obstacles: objobstacles, worldobstacles: objwobstacles,lights: objlights, "stations": stations, "initial-points": objipoints};
     var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(jsonobj, null, 2));
 
     el.setAttribute("href", "data:"+data);
@@ -704,6 +725,15 @@ function loadJSON(file, callback) {
       }
     }
 
+    // load world obstacles
+    if (JSONmap["worldobstacles"]){
+      for (var i=0; i<JSONmap["worldobstacles"].length; i++){
+       var lcoord=metersToPixels([JSONmap["worldobstacles"][i]["x"], JSONmap["worldobstacles"][i]["y"]]);
+       worldobstaclesx.push(lcoord[0]);
+       worldobstaclesy.push(lcoord[1]);
+      }
+    }
+
     // load  stations
     if (JSONmap["stations"]){
       for (var i=0; i<JSONmap["stations"].length; i++){
@@ -761,6 +791,7 @@ function render(){
   drawTool();
   drawLocations();
   drawConnections();
+  drawWorldObstacles();
   drawObstacles();
   drawOrigin();
   drawWalls();
@@ -894,6 +925,16 @@ function drawWalls(){
       ctx.lineTo(walllocationsx[i+1] , walllocationsy[i+1]);
     }
   ctx.stroke();
+}
+
+function drawWorldObstacles(){
+  var osize = 50/MPR;
+  //var osize = 10;
+
+  for (var i = 0; i < worldobstaclesx.length; i ++) {
+    ctx.fillStyle = "rgb(200, 200, 0)";
+    ctx.fillRect(worldobstaclesx[i]-osize/2, worldobstaclesy[i]-osize/2, osize, osize);
+  }
 }
 
 </script>
