@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en-US">
+	<head>
+	
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=Edge">
+	
+		<meta name="author" content="Javier Camara">
+		<title>BRASS MARS Map Editor | Instructions</title>
+		
+<body>
+<h1>BRASS MARS Map Editor Instructions</h1>
+
+<h2>Running the editor</h2>
+
+The editor runs under a web server. The easiest way to run the editor is creating a local web server by running <b> "python -m SimpleHTTPServer" </b> on a terminal from the folder where the editor is located.
+<br>
+Next, load the editor on a web browser (tested in Chrome Version 59.0.3071.115 (64-bit) OSX.
+    (e.g., "http://localhost:8000/brassmapeditor.html")
+
+<h2>Workflow</h2>
+Once the editor is loaded in the web browser (details about how to use the tool referenced in every step is given in the next section <a href="#tools">"Editor tool reference"</a>):
+<ul>
+<li> Load a background image of the map (png/jpg) to use as reference by clicking on the "Choose file" button next to "Background" on the top-left corner of the UI.
+<li> If you are continuing a previous working session, you can load your WIP map from a JSON file by clicking on the "Choose file" button next to "Map" on the top-center of the UI.
+<li> Set the origin of coordinates for the map. 
+<li> Use the waypoint creation tool to place waypoints on the map.
+<li> Connect waypoints using the connection tool to create allowed trajectories between waypoints.
+<li> Draw walls around to designate the areas that cannot be visited.
+<li> Place obstacles, charging stations, and lights, if needed.
+<li> Download the resulting map as a JSON file by clicking on the "Export Map" link.
+</ul>
+
+
+<h2><a id="tools"></a>Editor tool reference</h2>
+
+<table dir="ltr" width="500" border="1">
+	
+	<colgroup width="50%" />
+	<colgroup id="colgroup" class="colgroup" align="center" 
+			valign="middle" title="title" width="1*" 
+			span="2" />
+	<thead>
+		<tr>
+			<th scope="col">Tool</th>
+			<th scope="col">Description</th>
+		</tr>
+	</thead>
+
+	<tbody>
+		
+		<tr>
+			<td><b>Set origin of coordinates</b> </td>
+			<td>To set the origin of coordinates, click on <img src="/icons/origin.png">, and then click the location in the canvas where you want to set the origin of coordinates.
+			<br> 
+			<b>Note:</b> It is advisable to perform this as the first step when creating a map.
+			</td>
+		
+		</tr>
+
+		<tr>
+			<td><b>Create waypoint</b> </td>
+			<td>To create a waypoint in the map, select the waypoint creation tool <img src="/icons/location.png"> and click the location in the canvas where you want to create the waypoint.</td>
+		</tr>
+
+		<tr>
+			<td><b>Eliminate waypoint</b> </td>
+			<td>To eliminate a waypoint from the map, select the waypoint creation tool <img src="/icons/location.png"> and click on the waypoint that you want to eliminate while holding the <b>alt</b> key down. 
+			<br> 
+			<b>Note:</b> A waypoint will only be eliminated if it is not connected to any other waypoint.
+			 </td>
+		</tr>
+
+		<tr>
+			<td><b>Move waypoint</b> </td>
+			<td>To change the position of a waypoint in the map, select the waypoint move tool <img src="/icons/move.png"> and click on the waypoint that you want to move. Next, move the mouse around to change the position of the waypoint. Finally, click once more to release the waypoint in its new position.</td>
+		</tr>
+
+		<tr>
+			<td><b>Connect waypoints</b> </td>
+			<td>Connections designate allowed trajectories between waypoints. To create a connection between waypoints in the map, select the waypoint connection tool <img src="/icons/connect.png">. Then, click on the pair of waypoints that you want to connect.</td>
+		</tr>
+
+		<tr>
+			<td><b>Disconnect waypoints</b> </td>
+			<td>To eliminate a connection between waypoints in the map, select the waypoint disconnection tool <img src="/icons/removeconnect.png">. Then, click on any part of the line representing the connection that you want to eliminate.</td>
+		</tr>
+
+		<tr>
+			<td><b>Draw walls</b> </td>
+			<td>To draw walls that designate areas of the map that cannot be visited, select the wall tool <img src="/icons/wall.png">. Then, click on two arbitrary points that represent the endpoints of the wall.</td>
+		</tr>
+
+		<tr>
+			<td><b>Remove walls</b> </td>
+			<td>To eliminate walls, select the wall tool <img src="/icons/wall.png">. Then, click on any point of the line representing the wall while holding the <b>alt</b> key down.</td>
+		</tr>
+
+		<tr>
+			<td><b>Create lightpoint</b> </td>
+			<td>To place a lightpoint select the lightpoint placement tool <img src="/icons/lightbulb.png">. Then, click on any point of the map to place the lightpoint.</td>
+		</tr>
+
+	</tbody>
+</table>
+
+	</body>
+</html>

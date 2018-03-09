@@ -4,54 +4,78 @@ BRASS Map editor
 
 Author: Javier Camara
 
-Usage: 
+Running the editor: 
   
   1. Put on a web server, or create a local one running "python -m SimpleHTTPServer"
      from the folder where the editor is.
   2. Load on web browser (tested in Chrome Version 59.0.3071.115 (64-bit) OSX.
     (e.g., "http://localhost:8000/brassmapeditor.html")
-  2. Load a background image of the map (png) to use as reference.
-  3. Use the "location/node creation" tool to create map waypoints by 
-     clicking on the canvas.
-  4. Connect waypoints using the "connect" tool.
-  5. draw walls using the "draw walls tool". Ctrl-z triggers undo for walls.
-  5. Download the resulting map as a JSON file by clicking on the "Export Map" 
-     link.
+
+Using the editor:
+  Detailed instructions can be found in "instructions.html", or by clicking on
+  the "Help" link on the top-right corner of the editor's UI.
+
 =============================================================================
 -->
 
-<label>Background map image:&nbsp;</label> 
+
+<table cellpadding="0" cellspacing="0" width="800" border="1">
+<tr>
+<td>
+<label><font size="2">Background:</font>&nbsp;</label> 
+<input type="file" id="imageLoader" name="imageLoader"/> 
 
 <input type="text" label="m/px" id="mpr" size='6' value='18.5'/>
-<label for='mpr'>m/px</label>
-<input type="file" id="imageLoader" name="imageLoader"/> &nbsp;&nbsp; 
-<label>Map:&nbsp;</label>
-<input type="file" id="mapLoader" name="mapLoader"/>  &nbsp;&nbsp; 
+<label for='mpr'><font size="2">cm/px</font></label>
+</td>
+
+<td>
+<label><font size="2">Map:</font>&nbsp;</label>
+<input type="file" id="mapLoader" name="mapLoader"/> 
+</td>
+
+<td>
+  <center>
+    <font size="2">
 <a id="exportMap" onclick="exportMap(this);" class="btn"><i class="icon-download"></i> [Export Map]</a>
-</br>
+  </font>
+  </center>
+</td>
+<td>
+  <center>
+    <font size="2">
+    <a href="instructions.html" target="_blank">Help</a>
+  </font>
+  </center>
+</td>
+
+</tr>
+</table>
+<font size="2">
 Tools: &nbsp; 
 <button type="button" title="Set origin of coordinates" id="setOriginTool" name="setOriginTool" onclick="setToolOrigin(this)"><img src="icons/origin.png" width=15 /></button>
-<button type="button" title="Create waypoint" id="createTool" name="createTool" onclick="setToolCreate(this)"><img src="icons/location.png" width=15 /></button>
-<button type="button" title="Remove waypoint" id="removeTool" name="removeTool" onclick="setToolRemove(this)"><img src="icons/removelocation.png" width=15 /></button>
+<button type="button" title="Create waypoint (+alt key eliminates waypoint)" id="createTool" name="createTool" onclick="setToolCreate(this)"><img src="icons/location.png" width=15 /></button>
+<!-- <button type="button" title="Remove waypoint" id="removeTool" name="removeTool" onclick="setToolRemove(this)"><img src="icons/removelocation.png" width=15 /></button> -->
 <button type="button" title="Connect waypoints" id="connectTool" name="connectTool" onclick="setToolConnect(this)"><img src="icons/connect.png" width=15 /></button>
-<button type="button" title="Disconnect waypoints" id="disconnectTool" name="disconnectTool" onclick="setToolDisconnect(this)"><img src="icons/removeconnect.png" width=15 /></button>
+<!-- <button type="button" title="Disconnect waypoints" id="disconnectTool" name="disconnectTool" onclick="setToolDisconnect(this)"><img src="icons/removeconnect.png" width=15 /></button>-->
 <button type="button" title="Move waypoint" id="moveTool" name="moveTool" onclick="setToolMove(this)"><img src="icons/move.png" width=15 /></button>
-<button type="button" title="Draw walls" id="wallTool" name="wallTool" onclick="setToolWall(this)"><img src="icons/wall.png" width=15 /></button>
-<button type="button" title="Remove walls" id="removeWallTool" name="removeWallTool" onclick="setToolRemoveWall(this)"><img src="icons/removewall.png" width=15 /></button>
-<button type="button" title="Place obstacle Info" id="obstacleInfoTool" name="obstacleInfoTool" onclick="setToolInfoObstacle(this)"><img src="icons/obstacle.png" width=15 /></button>
-<button type="button" title="Place obstacle" id="obstacleTool" name="obstacleTool" onclick="setToolObstacle(this)"><img src="icons/obstacle.png" width=15 /></button>
-<button type="button" title="Remove obstacle" id="removeObstacleTool" name="removeObstacleTool" onclick="setToolRemoveObstacle(this)"><img src="icons/removeobstacle.png" width=15 /></button>
+<button type="button" title="Draw walls (+alt key eliminates wall)" id="wallTool" name="wallTool" onclick="setToolWall(this)"><img src="icons/wall.png" width=15 /></button>
+<!--<button type="button" title="Remove walls" id="removeWallTool" name="removeWallTool" onclick="setToolRemoveWall(this)"><img src="icons/removewall.png" width=15 /></button>-->
+<button type="button" title="Place obstacle (+alt key eliminates obstacle)" id="obstacleTool" name="obstacleTool" onclick="setToolObstacle(this)"><img src="icons/obstacle.png" width=15 /></button>
 <button type="button" title="Place light" id="placeLightTool" name="placeLightTool" onclick="setToolPlaceLight(this)"><img src="icons/lightbulb.png" width=15 /></button>
 <button type="button" title="Toggle charging station" id="toggleChargingTool" name="toggleChargingTool" onclick="setToolToggleCharging(this)"><img src="icons/battery.png" width=15 /></button>
+<button type="button" title="Place obstacle info" id="obstacleInfoTool" name="obstacleInfoTool" onclick="setToolInfoObstacle(this)"><img src="icons/obstacle.png" width=15 /></button>
+<button type="button" title="Remove obstacle info" id="removeObstacleTool" name="removeObstacleTool" onclick="setToolRemoveObstacle(this)"><img src="icons/removeobstacle.png" width=15 /></button>
 <select id="attEdit" name="attEdit">
-  <option value="o1"> Obstacle type 1</option>
-  <option value="o2"> Obstacle type 2</option>
+  <option value="easy"> Easy</option>
+  <option value="medium"> Medium</option>
+  <option value="difficult"> Difficult</option>
 </select>
 Display: 
 <input type="checkbox" title="Display background" id="displaybackgroundcheck"> Background
 <input type="checkbox" title="Display lights" id="displaylightscheck" checked> Lights
 <!-- <input type="checkbox" title="Display initial points" id="displayinitialpointscheck" checked> Initial points -->
-
+</font>
 <canvas id="imageCanvas"></canvas>
 <script>
 
@@ -98,6 +122,7 @@ var obstacles=[], obstaclelabels=[]; // obstacles associated with arcs
 var lightsx=[], lightsy=[], lightids=[]; // Lights
 var ipointsx=[], ipointsy=[]; // Initial points grid
 var IPS = 2 * grid_granularity; // Separation between initial points in grid
+var OBSTACLE_SIZE = 10 // 50/MPR; Size of obstacles
 var stations=[]; // charging stations
 var worldobstaclesx=[], worldobstaclesy=[]; // x,y obstacles 0.5x05m in world
 
@@ -113,6 +138,14 @@ function getLocationAt(x, y){
       return locationsl[i];
   }
   return "";
+}
+
+function getWorldObstacleAt(x, y){
+  for (var i = 0; i < worldobstaclesx.length; i ++) {
+    if (Math.abs(worldobstaclesx[i]-x)<=OBSTACLE_SIZE && Math.abs(worldobstaclesy[i]-y)<=OBSTACLE_SIZE)
+      return [i];
+  }
+  return -1;
 }
 
 function getLocationIndex(label){
@@ -384,12 +417,24 @@ function moveReporter(e){
 // Handles mouse click events
 function clickReporter(e){
   
-  if (tool==0){ // Creating nodes for locations
+  if (tool==0){ // Creating waypoints 
+    if (!e.altKey){
     locationsx.push(rx);
     locationsy.push(ry);
     locationsl.push("l"+locationsx.length.toString());
     console.log("l"+locationsx.length.toString()+" created.")
+    } else { // Eliminate waypoint
+      var sloc = getLocationAt(rx,ry)
+      slocidx=locationsl.indexOf(sloc)
+      if (slocidx>=0){
+        if (getConnections(sloc).length==0){ // Removed only if waypoint not connected to any other waypoint
+          locationsx.splice(slocidx,1);
+          locationsy.splice(slocidx,1);
+          locationsl.splice(slocidx,1);
+        }
+      }
     }
+  }
 
   if (tool==1){ // Creating connections between locations
     if (connecting==false){  // If starting a connection (selecting start node)
@@ -424,8 +469,12 @@ function clickReporter(e){
   }
 
   if (tool==4){ // adding wall vertex
-    walllocationsx.push(rx);
-    walllocationsy.push(ry);
+    if (!e.altKey){
+      walllocationsx.push(rx);
+      walllocationsy.push(ry);
+    } else { // Remove wall
+      removeWallAt(rx, ry);
+    }
   }
 
   if (tool==5){ // Creating obstacles between waypoints
@@ -461,10 +510,6 @@ function clickReporter(e){
     }
   }
 
-  if (tool==7) {
-    removeWallAt(rx, ry);
-  }
-
   if (tool==8){ // Creating lights
     lightsx.push(rx);
     lightsy.push(ry);
@@ -486,21 +531,19 @@ function clickReporter(e){
     removeConnectionAt(rx,ry);
   }
 
-  if (tool==11){ // Eliminate waypoint
-    var sloc = getLocationAt(rx,ry)
-    slocidx=locationsl.indexOf(sloc)
-    if (slocidx>=0){
-      if (getConnections(sloc).length==0){ // Removed only if waypoint not connected to any other waypoint
-        locationsx.splice(slocidx,1);
-        locationsy.splice(slocidx,1);
-        locationsl.splice(slocidx,1);
-      }
-    }
-  }
 
-  if (tool==12){ // Place real world obstacle
+
+  if (tool==12){ 
+    if (!e.altKey){ // Place real world obstacle
     worldobstaclesx.push(rx);
     worldobstaclesy.push(ry);
+    } else{ // Delete obstacle if found in location
+      var wobs = getWorldObstacleAt(rx,ry);
+      if (wobs>=0){
+        worldobstaclesx.splice(wobs,1);
+        worldobstaclesy.splice(wobs,1); 
+      }
+    }
   }
 
 }
@@ -928,12 +971,10 @@ function drawWalls(){
 }
 
 function drawWorldObstacles(){
-  var osize = 50/MPR;
-  //var osize = 10;
 
   for (var i = 0; i < worldobstaclesx.length; i ++) {
-    ctx.fillStyle = "rgb(200, 200, 0)";
-    ctx.fillRect(worldobstaclesx[i]-osize/2, worldobstaclesy[i]-osize/2, osize, osize);
+    ctx.fillStyle = "rgb(200, 0, 200)";
+    ctx.fillRect(worldobstaclesx[i]-OBSTACLE_SIZE/2, worldobstaclesy[i]-OBSTACLE_SIZE/2, OBSTACLE_SIZE, OBSTACLE_SIZE);
   }
 }
 
