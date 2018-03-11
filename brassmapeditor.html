@@ -2,7 +2,9 @@
 =============================================================================
 BRASS Map editor 
 
-Author: Javier Camara
+Authors: Javier Camara and Bradley Schmerl
+
+Please report bugs and other issues to jcmoreno@cs.cmu.edu
 
 Running the editor: 
   
@@ -19,7 +21,7 @@ Using the editor:
 -->
 
 
-<table cellpadding="0" cellspacing="0" width="800" border="1">
+<table cellpadding="0" cellspacing="0" width="800" border="1" bordercolor="#dddddd">
 <tr>
 <td>
 <label><font size="2">Background:</font>&nbsp;</label> 
@@ -64,8 +66,8 @@ Tools: &nbsp;
 <button type="button" title="Place obstacle (+alt key eliminates obstacle)" id="obstacleTool" name="obstacleTool" onclick="setToolObstacle(this)"><img src="icons/obstacle.png" width=15 /></button>
 <button type="button" title="Place light" id="placeLightTool" name="placeLightTool" onclick="setToolPlaceLight(this)"><img src="icons/lightbulb.png" width=15 /></button>
 <button type="button" title="Toggle charging station" id="toggleChargingTool" name="toggleChargingTool" onclick="setToolToggleCharging(this)"><img src="icons/battery.png" width=15 /></button>
-<button type="button" title="Place obstacle info" id="obstacleInfoTool" name="obstacleInfoTool" onclick="setToolInfoObstacle(this)"><img src="icons/obstacle.png" width=15 /></button>
-<button type="button" title="Remove obstacle info" id="removeObstacleTool" name="removeObstacleTool" onclick="setToolRemoveObstacle(this)"><img src="icons/removeobstacle.png" width=15 /></button>
+<button type="button" title="Place obstacle info" id="obstacleInfoTool" name="obstacleInfoTool" onclick="setToolInfoObstacle(this)"><img src="icons/attribute.png" width=15 /></button>
+<button type="button" title="Remove obstacle info" id="removeObstacleTool" name="removeObstacleTool" onclick="setToolRemoveObstacle(this)"><img src="icons/removeattribute.png" width=15 /></button>
 <select id="attEdit" name="attEdit">
   <option value="easy"> Easy</option>
   <option value="medium"> Medium</option>

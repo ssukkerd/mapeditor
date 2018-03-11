@@ -10,13 +10,19 @@
 		
 <body>
 <h1>BRASS MARS Map Editor Instructions</h1>
+<h4>Updated March 11, 2018.</h4>
+
+<b>Authors:</b> Javier C&aacute;mara and Bradley Schmerl<br>
+
+Please report bugs and other issues to: <a href="mailto:jcmoreno@cs.cmu.edu">jcmoreno@cs.cmu.edu</a>
+
 
 <h2>Running the editor</h2>
 
 The editor runs under a web server. The easiest way to run the editor is creating a local web server by running <b> "python -m SimpleHTTPServer" </b> on a terminal from the folder where the editor is located.
 <br>
 Next, load the editor on a web browser (tested in Chrome Version 59.0.3071.115 (64-bit) OSX.
-    (e.g., "http://localhost:8000/brassmapeditor.html")
+    (e.g., "http://localhost:8000/brassmapeditor.html").
 
 <h2>Workflow</h2>
 Once the editor is loaded in the web browser (details about how to use the tool referenced in every step is given in the next section <a href="#tools">"Editor tool reference"</a>):
@@ -100,6 +106,34 @@ Once the editor is loaded in the web browser (details about how to use the tool 
 			<td><b>Create lightpoint</b> </td>
 			<td>To place a lightpoint select the lightpoint placement tool <img src="/icons/lightbulb.png">. Then, click on any point of the map to place the lightpoint.</td>
 		</tr>
+
+		<tr>
+			<td><b>Toggle charging station</b> </td>
+			<td>To turn a regular waypoint into a charging station, select the toggle charging station tool <img src="/icons/battery.png">. Then, click on a waypoint to turn it into a charging station.</td>
+		</tr>
+
+		<tr>
+			<td><b>Place obstacle</b> </td>
+			<td>To place an obstacle in the map, select the obstacle placement tool <img src="/icons/obstacle.png">. Then, click on the location of the map where you want to place the obstacle.</td>
+		</tr>
+
+		<tr>
+			<td><b>Remove obstacle</b> </td>
+			<td>To remove an obstacle from the map, select the obstacle placement tool <img src="/icons/obstacle.png">. Then, click on the obstacle you want to remove while holding the <b>alt</b> key down.</td>
+		</tr>
+
+		<tr>
+			<td><b>Add obstacle info to connection</b> </td>
+			<td>To add an attribute with obstacle information to a connection between waypoints, select the obstacle info tool <img src="/icons/attribute.png">. Then, select a category from the dropdown box next to the tool button. Finally, select the two endpoints of the connection where the information is going to be added.
+			<br> 
+			<b>Note:</b> This tool will be generalized to an attribute edition tool for connections.
+		</tr>
+
+		<tr>
+			<td><b>Eliminate obstacle info from connection</b> </td>
+			<td>To eliminate the attribute with obstacle information from a connection between waypoints, select the obstacle info removal tool <img src="/icons/removeattribute.png">. Next, select the two endpoints of the connection where the information is going to be eliminated.
+		</tr>
+
 
 	</tbody>
 </table>
