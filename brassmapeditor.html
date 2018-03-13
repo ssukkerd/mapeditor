@@ -404,8 +404,9 @@ function setToolObstacle(){
 
 // Handles mouse move events
 function moveReporter(e){
-  ex = e.pageX-10;
-  ey = e.pageY-40;
+  var rect = imageCanvas.getBoundingClientRect();
+  ex = e.pageX-rect.left;
+  ey = e.pageY-rect.top;
   rx=Math.floor(ex/grid_granularity)*grid_granularity;
   ry=Math.floor(ey/grid_granularity)*grid_granularity;
    
