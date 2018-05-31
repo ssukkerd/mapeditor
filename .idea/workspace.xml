@@ -2,8 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ef80b830-21e5-4868-bf3a-54abcf6c6635" name="Default" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/brassmapeditor.html" beforeDir="false" afterPath="$PROJECT_DIR$/brassmapeditor.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/main.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/style.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test.html" beforeDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -17,30 +20,34 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="brassmapeditor.html" pinned="false" current-in-tab="true">
+      <file leaf-file-name="brassmapeditor.html" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/brassmapeditor.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="300">
-              <caret line="80" column="8" lean-forward="true" selection-start-line="80" selection-start-column="8" selection-end-line="80" selection-end-column="8" />
+            <state relative-caret-position="466">
+              <caret line="91" column="34" lean-forward="true" selection-start-line="91" selection-start-column="34" selection-end-line="91" selection-end-column="34" />
               <folding>
                 <element signature="n#tr#0;n#table#0;n#!!top" />
-                <element signature="n#tr#1;n#table#0;n#body#0;n#html#0;n#!!top" />
                 <element signature="n#style#0;n#i#0;n#button#9;n#font#0;n#tr#1;n#table#0;n#body#0;n#html#0;n#!!top" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="main.js" pinned="false" current-in-tab="false">
+      <file leaf-file-name="main.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/main.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="330">
-              <caret line="22" lean-forward="true" selection-start-line="22" selection-end-line="22" />
+            <state relative-caret-position="283">
+              <caret line="497" column="47" lean-forward="true" selection-start-line="497" selection-start-column="47" selection-end-line="497" selection-end-column="47" />
               <folding>
-                <element signature="n#!!doc" expanded="true" />
+                <element signature="e#4357#4570#0" />
+                <element signature="e#4605#4817#0" />
                 <element signature="e#2689#2812#0" />
                 <element signature="e#2839#2975#0" />
                 <element signature="e#3007#3168#0" />
+                <element signature="e#5419#5470#0" />
+                <element signature="e#5503#5650#0" />
+                <element signature="e#5683#5796#0" />
+                <element signature="e#5830#5925#0" />
                 <element signature="e#3729#3786#0" />
                 <element signature="e#3822#4246#0" />
                 <element signature="e#4304#4680#0" />
@@ -50,9 +57,14 @@
                 <element signature="e#6235#6621#0" />
                 <element signature="e#6657#6830#0" />
                 <element signature="e#6862#7115#0" />
-                <element signature="e#9511#13488#0" />
                 <element signature="e#13535#14452#0" />
                 <element signature="e#14725#17313#0" />
+                <element signature="e#18956#19142#0" />
+                <element signature="e#19166#19184#0" />
+                <element signature="e#19206#21779#0" />
+                <element signature="e#21803#22213#0" />
+                <element signature="e#22239#22974#0" />
+                <element signature="e#24721#25323#0" />
                 <element signature="e#26909#27691#0" />
               </folding>
             </state>
@@ -62,17 +74,8 @@
       <file leaf-file-name="style.css" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/style.css">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="30">
-              <caret line="2" column="20" lean-forward="true" selection-start-line="2" selection-start-column="20" selection-end-line="2" selection-end-column="20" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="test.html" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/test.html">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="135">
-              <caret line="9" column="7" lean-forward="true" selection-start-line="9" selection-start-column="7" selection-end-line="9" selection-end-column="7" />
+            <state relative-caret-position="15">
+              <caret line="1" column="23" selection-start-line="1" selection-start-column="23" selection-end-line="1" selection-end-column="23" />
             </state>
           </provider>
         </entry>
@@ -90,17 +93,12 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>parseMap</find>
-      <find>actual_JSON</find>
-      <find>ctx</find>
       <find>update()</find>
       <find>update</find>
       <find>render()</find>
-      <find>tool</find>
       <find>tool==5</find>
       <find>getLocationAt</find>
       <find>initStroke</find>
-      <find>attEdit</find>
       <find>sloc</find>
       <find>importMap</find>
       <find>from</find>
@@ -113,9 +111,18 @@
       <find>clickRepo</find>
       <find>render(</find>
       <find>parseRoute</find>
-      <find>render</find>
       <find>icon-download</find>
       <find>img</find>
+      <find>setTool</find>
+      <find>actual_JSON_map</find>
+      <find>tool</find>
+      <find>imageLoader</find>
+      <find>ctx</find>
+      <find>parse</find>
+      <find>render</find>
+      <find>parseR</find>
+      <find>tool ==</find>
+      <find>attEdit</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -128,13 +135,19 @@
         <option value="$PROJECT_DIR$/route_callout.json" />
         <option value="$PROJECT_DIR$/test.html" />
         <option value="$PROJECT_DIR$/style.css" />
-        <option value="$PROJECT_DIR$/main.js" />
         <option value="$PROJECT_DIR$/brassmapeditor.html" />
+        <option value="$PROJECT_DIR$/main.js" />
       </list>
     </option>
   </component>
   <component name="JsBuildToolGruntFileManager" detection-done="true" sorting="DEFINITION_ORDER" />
   <component name="JsBuildToolPackageJson" detection-done="true" sorting="DEFINITION_ORDER" />
+  <component name="JsFlowSettings">
+    <service-enabled>true</service-enabled>
+    <exe-path />
+    <other-services-enabled>true</other-services-enabled>
+    <auto-save>true</auto-save>
+  </component>
   <component name="JsGulpfileManager">
     <detection-done>true</detection-done>
     <sorting>DEFINITION_ORDER</sorting>
@@ -142,7 +155,7 @@
   <component name="NodePackageJsonFileManager">
     <packageJsonPaths />
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
+  <component name="ProjectFrameBounds" fullScreen="true">
     <option name="y" value="23" />
     <option name="width" value="1280" />
     <option name="height" value="735" />
@@ -169,11 +182,13 @@
   </component>
   <component name="PropertiesComponent">
     <property name="DefaultHtmlFileTemplate" value="HTML File" />
+    <property name="JavaScriptWeakerCompletionTypeGuess" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="list.type.of.created.stylesheet" value="CSS" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+    <property name="settings.editor.selected.configurable" value="configurable.group.editor" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -203,25 +218,25 @@
       <workItem from="1527680725260" duration="11000" />
       <workItem from="1527729850912" duration="74000" />
       <workItem from="1527773245455" duration="218000" />
-      <workItem from="1527773516527" duration="11030000" />
+      <workItem from="1527773516527" duration="17366000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="25344000" />
+    <option name="totallyTimeSpent" value="31680000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="23" width="1280" height="735" extended-state="6" />
+    <frame x="0" y="0" width="1280" height="800" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.1078125" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.06875" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Event Log" order="11" side_tool="true" />
       <window_info anchor="bottom" id="Run" order="2" />
       <window_info anchor="bottom" id="Version Control" order="9" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info anchor="bottom" id="Terminal" order="8" visible="true" weight="0.11951589" />
+      <window_info anchor="bottom" id="Terminal" order="8" visible="true" weight="0.13636364" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -242,7 +257,7 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="1" />
+      <option name="time" value="2" />
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
@@ -556,20 +571,36 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/style.css">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="30">
-          <caret line="2" column="20" lean-forward="true" selection-start-line="2" selection-start-column="20" selection-end-line="2" selection-end-column="20" />
+        <state relative-caret-position="15">
+          <caret line="1" column="23" selection-start-line="1" selection-start-column="23" selection-end-line="1" selection-end-column="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/brassmapeditor.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="466">
+          <caret line="91" column="34" lean-forward="true" selection-start-line="91" selection-start-column="34" selection-end-line="91" selection-end-column="34" />
+          <folding>
+            <element signature="n#tr#0;n#table#0;n#!!top" />
+            <element signature="n#style#0;n#i#0;n#button#9;n#font#0;n#tr#1;n#table#0;n#body#0;n#html#0;n#!!top" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/main.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="330">
-          <caret line="22" lean-forward="true" selection-start-line="22" selection-end-line="22" />
+        <state relative-caret-position="283">
+          <caret line="497" column="47" lean-forward="true" selection-start-line="497" selection-start-column="47" selection-end-line="497" selection-end-column="47" />
           <folding>
-            <element signature="n#!!doc" expanded="true" />
+            <element signature="e#4357#4570#0" />
+            <element signature="e#4605#4817#0" />
             <element signature="e#2689#2812#0" />
             <element signature="e#2839#2975#0" />
             <element signature="e#3007#3168#0" />
+            <element signature="e#5419#5470#0" />
+            <element signature="e#5503#5650#0" />
+            <element signature="e#5683#5796#0" />
+            <element signature="e#5830#5925#0" />
             <element signature="e#3729#3786#0" />
             <element signature="e#3822#4246#0" />
             <element signature="e#4304#4680#0" />
@@ -579,22 +610,15 @@
             <element signature="e#6235#6621#0" />
             <element signature="e#6657#6830#0" />
             <element signature="e#6862#7115#0" />
-            <element signature="e#9511#13488#0" />
             <element signature="e#13535#14452#0" />
             <element signature="e#14725#17313#0" />
+            <element signature="e#18956#19142#0" />
+            <element signature="e#19166#19184#0" />
+            <element signature="e#19206#21779#0" />
+            <element signature="e#21803#22213#0" />
+            <element signature="e#22239#22974#0" />
+            <element signature="e#24721#25323#0" />
             <element signature="e#26909#27691#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/brassmapeditor.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="300">
-          <caret line="80" column="8" lean-forward="true" selection-start-line="80" selection-start-column="8" selection-end-line="80" selection-end-column="8" />
-          <folding>
-            <element signature="n#tr#0;n#table#0;n#!!top" />
-            <element signature="n#tr#1;n#table#0;n#body#0;n#html#0;n#!!top" />
-            <element signature="n#style#0;n#i#0;n#button#9;n#font#0;n#tr#1;n#table#0;n#body#0;n#html#0;n#!!top" expanded="true" />
           </folding>
         </state>
       </provider>

@@ -56,7 +56,7 @@ Using the editor:
     </td>
 </tr>
     <tr>
-    <td colspan="5">
+    <td colspan="2">
     Tools: &nbsp;
     <button type="button" title="Set origin of coordinates" id="setOriginTool" name="setOriginTool" onclick="setToolOrigin(this)"><i class="fas fa-bullseye"></i></button>
     <button type="button" title="Create waypoint (+alt key eliminates waypoint)" id="createTool" name="createTool" onclick="setToolCreate(this)"><i class="fas fa-map-marker-alt"></i></button>
@@ -76,6 +76,15 @@ Using the editor:
     Display:
     <input type="checkbox" title="Display background" id="displaybackgroundcheck"> Background
     <input type="checkbox" title="Display lights" id="displaylightscheck" checked> Lights
+    </td>
+    <td colspan="3">
+        <button type="button" title="Start editing route" id="startRouteTool">Start</button>
+        <button type="button" title="Remove edges from route" id="removeRouteTool" disabled>Remove</button>
+        <button type="button" title="Add edges to route" id="addRouteTool" disabled>Add</button>
+        <button type="button" title="Add adaptation" id="addAdaptTool" disabled>Add adaptation</button>
+        <button type="button" title="Remove adaptation" id="removeAdaptTool" onclick="setToolRemoveAdapt(this)" disabled>Remove adaptation</button>
+        <button type="button" title="Finish editing route" id="finishRouteTool" disabled>Finish</button>
+        <button type="button" title="Start editing route" id="cancelRouteTool">Cancel</button>
     </td>
 </tr>
 </table>

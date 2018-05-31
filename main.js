@@ -1,3 +1,4 @@
+
 // =============================================================================
 // User interface vars
 // =============================================================================
@@ -15,8 +16,28 @@ var canvas = document.getElementById('imageCanvas');
 var saveButton = document.getElementById("saveMap");
 var attEdit = document.getElementById("attEdit");
 
+var routeEdit = false;
+
+var removeRouteBtn = document.getElementById("removeRouteTool");
+var addRouteBtn = document.getElementById("addRouteTool");
+var removeRouteBtn = document.getElementById("removeRouteTool");
+var addAdaptBtn = document.getElementById("addAdaptTool");
+var removeAdaptBtn = document.getElementById("removeAdaptTool");
+var finishRouteBtn = document.getElementById("finishRouteTool");
+
+var startEditBtn = document.getElementById("startRouteTool");
+startEditBtn.addEventListener("click", function() {
+    routeEdit = true;
+    this.disabled = true;
+    addRouteBtn.disabled = false;
+    removeRouteBtn.disabled = false;
+    addAdaptBtn.disabled = false;
+    removeAdaptBtn.disabled = false;
+    finishRouteBtn.disabled = false;
+});
+
 var ctx = canvas.getContext('2d');
-var img =null;
+var img = null;
 
 var obstacleicon = new Image();
 obstacleicon.src = "/icons/obstacle.png";
@@ -28,38 +49,38 @@ var batteryicon = new Image();
 batteryicon.src = "/icons/battery.png";
 
 
-rx=ry=0;  // current cursor position
-v=3;
+rx = ry = 0;  // current cursor position
+v = 3;
 
-grid_granularity=5;  // Snap grid cell size
+grid_granularity = 5;  // Snap grid cell size
+
 
 // =============================================================================
 // Map vars
 // =============================================================================
 
-var MPR = 22; // Meter to pixel ratio
-var origin=[];
-var locationsx=[], locationsy=[], locationsl=[]; // location coordinates and labels (nodes)
-var connections=[];  // trajectories (arcs)
-var walllocationsx=[], walllocationsy=[]; // wall location coordinates
-var obstacles=[], obstaclelabels=[]; // obstacles associated with arcs
-var lightsx=[], lightsy=[], lightids=[]; // Lights
-var ipointsx=[], ipointsy=[]; // Initial points grid
-var IPS = 2 * grid_granularity; // Separation between initial points in grid
-var OBSTACLE_SIZE = 10; // 50/MPR; Size of obstacles
-var stations=[]; // charging stations
-var worldobstaclesx=[], worldobstaclesy=[]; // x,y obstacles 0.5x05m in world
+var MPR = 22;                                           // Meter to pixel ratio
+var origin = [];
+var locationsx = [], locationsy = [], locationsl = [];  // location coordinates and labels (nodes)
+var connections=[];                                     // trajectories (arcs)
+var walllocationsx=[], walllocationsy=[];               // wall location coordinates
+var obstacles=[], obstaclelabels=[];                    // obstacles associated with arcs
+var lightsx=[], lightsy=[], lightids=[];                // Lights
+var ipointsx=[], ipointsy=[];                           // Initial points grid
+var IPS = 2 * grid_granularity;                         // Separation between initial points in grid
+var OBSTACLE_SIZE = 10;                                 // 50/MPR; Size of obstacles
+var stations=[];                                        // charging stations
+var worldobstaclesx=[], worldobstaclesy=[];             // x,y obstacles 0.5x05m in world
 var route = [];
 var callouts = [];
 var calloutloc = {};
+
 
 // =============================================================================
 // Map querying (checking locations at x,y position, etc.)
 // =============================================================================
 
-
-
-function getLocationAt(x, y){
+function getLocationAt(x, y) {
     for (var i = 0; i < locationsx.length; i ++) {
         if (Math.abs(locationsx[i]-x)<=grid_granularity && Math.abs(locationsy[i]-y)<=grid_granularity)
             return locationsl[i];
@@ -110,7 +131,6 @@ function pixelsToMeters(coords){
 }
 
 function metersToPixels(coords){
-    var result = [];
     return ([Math.floor(origin[0]+coords[0]*MPR), Math.floor(origin[1]-coords[1]*MPR)]);
 }
 
@@ -121,7 +141,6 @@ function originPixelsToMeters() {
 function originMetersToPixels(o) {
     return [Math.floor(o[0]*MPR), Math.floor(o[1]*MPR)]
 }
-
 
 function coordsWithinWalls (x, y){
     /*  var wlx=[], wly = [];
@@ -202,7 +221,6 @@ function removeConnectionAt(px, py) {
     }
     connections = newconns;
 }
-
 
 function removeObstaclesBetweenLocations (l1, l2){
     var auxobstacles=[];
@@ -328,13 +346,16 @@ function setToolObstacle(){
     tool = 12;
 }
 
-function setToolRoute() {
-
+function setToolRemoveAdapt() {
+    connecting = false;
+    moving = false;
+    tool = 13;
+    console.log("remove adapt tool");
 }
 
 
 // Handles mouse move events
-function moveReporter(e){
+function moveReporter(e) {
     var rect = imageCanvas.getBoundingClientRect();
     ex = e.pageX-rect.left;
     ey = e.pageY-rect.top;
@@ -466,8 +487,6 @@ function clickReporter(e){
         removeConnectionAt(rx,ry);
     }
 
-
-
     if (tool==12){
         if (!e.altKey){ // Place real world obstacle
             worldobstaclesx.push(rx);
@@ -481,9 +500,15 @@ function clickReporter(e){
         }
     }
 
+    if (tool == 13) {
+        if (callouts[rx] != undefined && callouts[rx][ry] != undefined) {
+            // assuming only one action per node.
+            // maybe in the case of multiple, can give a drop down menu to choose which to delete?
+            callouts[rx][ry].splice(0, 1);
+        }
+    }
+
 }
-
-
 
 
 // Keyboard handling
@@ -614,7 +639,7 @@ function getURLPath(urlStr){
 }
 
 var actual_JSON;
-var actual_JSON_map;
+var actual_JSON_route;
 
 function load(filename) {
     console.log(filename);
@@ -630,7 +655,7 @@ function loadRoute(filename) {
     console.log(filename);
     var filename2 = getURLPath(window.location.href) + "/" + filename;
     loadJSON(filename2, function(response) {
-        actual_JSON_map = JSON.parse(response);
+        actual_JSON_route = JSON.parse(response);
         clearRoute();
         parseRoute();
     });
@@ -732,7 +757,7 @@ function parseMap() {
         }
     }
 
-    // load  stations
+    // load stations
     if (JSONmap["stations"]){
         for (var i=0; i<JSONmap["stations"].length; i++){
             stations.push(JSONmap["stations"][i]);
@@ -742,13 +767,25 @@ function parseMap() {
 }
 
 function parseRoute() {
-    var routeList = actual_JSON_map["route"];
+    var routeList = actual_JSON_route["route"];
     for (var i = 0; i < routeList.length - 1; i++) {
         route.push({from: routeList[i], to: routeList[i+1]});
     }
-    var actions = actual_JSON_map["actions"];
+    var actions = actual_JSON_route["actions"];
     for (var i = 0; i < actions.length; i++) {
-        callouts.push({x: actions[i]["coords"]["x"], y: actions[i]["coords"]["y"], action: actions[i]["action"]})
+        x = actions[i]["coords"]["x"];
+        y = actions[i]["coords"]["y"];
+        action = actions[i]["action"];
+        if (callouts[x] != undefined) {
+            if (callouts[x][y] != undefined) {
+                callouts[x][y].push(action)
+            } else {
+                callouts[x][y] = [action];
+            }
+        } else {
+            callouts[x] = {};
+            callouts[x][y] = [action];
+        }
     }
     console.log(callouts);
 }
@@ -800,13 +837,12 @@ function render(){
     drawTool();
     drawLocations();
     drawConnections();
-    drawConnectionsRoute();
-    drawCallouts();
-    drawCalloutsBubble();
     drawWorldObstacles();
     //drawObstacles();
     drawOrigin();
     drawWalls();
+    drawConnectionsRoute();
+    drawCallouts();
     if (displaylightscheck.checked)
         drawLights();
 //  if (displayinitialpointscheck.checked)
@@ -881,7 +917,7 @@ function drawLocations(){
         ctx.fillStyle = "rgb(0, 0, 0)";
         ctx.font = "10px Georgia";
         ctx.fillText(locationsl[i],locationsx[i]+grid_granularity,locationsy[i]+grid_granularity);
-        if (stations.indexOf(locationsl[i])>=0){
+        if (stations.indexOf(locationsl[i])>=0) {
             ctx.drawImage(batteryicon, locationsx[i]-batteryicon.width-Math.floor(grid_granularity/2), locationsy[i]-Math.floor(grid_granularity/2));
         }
     }
@@ -943,23 +979,29 @@ function drawConnectionsRoute(){
 }
 
 function drawCallouts() {
-    for (var i = 0; i < callouts.length; i++) {
-        ctx.fillStyle = "rgb(0, 200, 0)";
-        ctx.fillRect(callouts[i].x-grid_granularity/2, callouts[i].y-grid_granularity/2, grid_granularity, grid_granularity);
+    for (var x in callouts) {
+        if (!callouts.hasOwnProperty(x)) continue;
+        col = callouts[x];
+        for (var y in col) {
+            if (!col.hasOwnProperty(y)) continue;
+            row = col[y];
+            for (var i = 0; i < row.length; i++) {
+                ctx.fillStyle = "rgb(0, 200, 0)";
+                ctx.fillRect(x-grid_granularity/2, y-grid_granularity/2, grid_granularity, grid_granularity);
+
+                ctx.fillStyle = 'rgba(225,225,225,0.8)';
+                w = 50;
+                h = 30;
+                ctx.fillRect(x-w/2, y-h, w, h);
+                ctx.fillStyle = "rgb(0, 0, 0)";
+                ctx.font = "10px Helvetica";
+                ctx.fillText(row[i], x-w/2, y-h+10);
+            }
+        }
+
     }
 }
 
-function drawCalloutsBubble() {
-    for (var i = 0; i < callouts.length; i++) {
-        ctx.fillStyle = 'rgba(225,225,225,0.8)';
-        w = 50;
-        h = 30;
-        ctx.fillRect(callouts[i].x-w/2, callouts[i].y-h, w, h);
-        ctx.fillStyle = "rgb(0, 0, 0)";
-        ctx.font = "10px Helvetica";
-        ctx.fillText(callouts[i].action, callouts[i].x-w/2, callouts[i].y-h+10);
-    }
-}
 
 function drawObstacles(){
     for (var i = 0; i < obstacles.length; i += 1) {
