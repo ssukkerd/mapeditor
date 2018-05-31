@@ -1,4 +1,57 @@
+// =============================================================================
+// User interface vars
+// =============================================================================
 
+var imageLoader = document.getElementById('imageLoader');
+imageLoader.addEventListener('change', importImage, false);
+
+var mapLoader = document.getElementById('mapLoader');
+mapLoader.addEventListener('change', importMap, false);
+
+var routeLoader = document.getElementById('routeLoader');
+routeLoader.addEventListener('change', importRoute, false);
+
+var canvas = document.getElementById('imageCanvas');
+var saveButton = document.getElementById("saveMap");
+var attEdit = document.getElementById("attEdit");
+
+var ctx = canvas.getContext('2d');
+var img =null;
+
+var obstacleicon = new Image();
+obstacleicon.src = "/icons/obstacle.png";
+
+var lighticon = new Image();
+lighticon.src = "/icons/lightbulb.png";
+
+var batteryicon = new Image();
+batteryicon.src = "/icons/battery.png";
+
+
+rx=ry=0;  // current cursor position
+v=3;
+
+grid_granularity=5;  // Snap grid cell size
+
+// =============================================================================
+// Map vars
+// =============================================================================
+
+var MPR = 22; // Meter to pixel ratio
+var origin=[];
+var locationsx=[], locationsy=[], locationsl=[]; // location coordinates and labels (nodes)
+var connections=[];  // trajectories (arcs)
+var walllocationsx=[], walllocationsy=[]; // wall location coordinates
+var obstacles=[], obstaclelabels=[]; // obstacles associated with arcs
+var lightsx=[], lightsy=[], lightids=[]; // Lights
+var ipointsx=[], ipointsy=[]; // Initial points grid
+var IPS = 2 * grid_granularity; // Separation between initial points in grid
+var OBSTACLE_SIZE = 10; // 50/MPR; Size of obstacles
+var stations=[]; // charging stations
+var worldobstaclesx=[], worldobstaclesy=[]; // x,y obstacles 0.5x05m in world
+var route = [];
+var callouts = [];
+var calloutloc = {};
 
 // =============================================================================
 // Map querying (checking locations at x,y position, etc.)
@@ -275,6 +328,11 @@ function setToolObstacle(){
     tool = 12;
 }
 
+function setToolRoute() {
+
+}
+
+
 // Handles mouse move events
 function moveReporter(e){
     var rect = imageCanvas.getBoundingClientRect();
@@ -292,6 +350,7 @@ function moveReporter(e){
 
 // Handles mouse click events
 function clickReporter(e){
+    console.log(`point ${rx}, ${ry}`);
 
     if (tool==0){ // Creating waypoints
         if (!e.altKey){
@@ -562,7 +621,6 @@ function load(filename) {
     var filename2 = getURLPath(window.location.href) + "/" + filename;
     loadJSON(filename2, function(response) {
         actual_JSON = JSON.parse(response);
-        console.log(actual_JSON);
         clearMap();
         parseMap();
     });
@@ -573,7 +631,6 @@ function loadRoute(filename) {
     var filename2 = getURLPath(window.location.href) + "/" + filename;
     loadJSON(filename2, function(response) {
         actual_JSON_map = JSON.parse(response);
-        console.log(actual_JSON_map);
         clearRoute();
         parseRoute();
     });
@@ -689,6 +746,11 @@ function parseRoute() {
     for (var i = 0; i < routeList.length - 1; i++) {
         route.push({from: routeList[i], to: routeList[i+1]});
     }
+    var actions = actual_JSON_map["actions"];
+    for (var i = 0; i < actions.length; i++) {
+        callouts.push({x: actions[i]["coords"]["x"], y: actions[i]["coords"]["y"], action: actions[i]["action"]})
+    }
+    console.log(callouts);
 }
 
 
@@ -732,13 +794,15 @@ function update(){
 }
 
 function render(){
-    MPR = parseFloat(document.getElementById('mpr').value)
+    MPR = parseFloat(document.getElementById('mpr').value);
     drawGrid();
     drawCoordinates();
     drawTool();
     drawLocations();
     drawConnections();
     drawConnectionsRoute();
+    drawCallouts();
+    drawCalloutsBubble();
     drawWorldObstacles();
     //drawObstacles();
     drawOrigin();
@@ -815,7 +879,7 @@ function drawLocations(){
         ctx.fillStyle = "rgb(200, 0, 0)";
         ctx.fillRect(locationsx[i]-grid_granularity/2, locationsy[i]-grid_granularity/2, grid_granularity, grid_granularity);
         ctx.fillStyle = "rgb(0, 0, 0)";
-        ctx.font="10px Georgia";
+        ctx.font = "10px Georgia";
         ctx.fillText(locationsl[i],locationsx[i]+grid_granularity,locationsy[i]+grid_granularity);
         if (stations.indexOf(locationsl[i])>=0){
             ctx.drawImage(batteryicon, locationsx[i]-batteryicon.width-Math.floor(grid_granularity/2), locationsy[i]-Math.floor(grid_granularity/2));
@@ -848,11 +912,12 @@ function drawConnections(){
     ctx.stroke();
 }
 
+
+/* Function to draw robot routes */
 function drawConnectionsRoute(){
     ctx.strokeStyle = '#0000ff';
     ctx.lineWidth=2;
     ctx.beginPath();
-    console.log(route);
     for (var i = 0; i < route.length; i += 1) {
         to = getCoords(route[i].to);
         from = getCoords(route[i].from);
@@ -877,6 +942,24 @@ function drawConnectionsRoute(){
     ctx.stroke();
 }
 
+function drawCallouts() {
+    for (var i = 0; i < callouts.length; i++) {
+        ctx.fillStyle = "rgb(0, 200, 0)";
+        ctx.fillRect(callouts[i].x-grid_granularity/2, callouts[i].y-grid_granularity/2, grid_granularity, grid_granularity);
+    }
+}
+
+function drawCalloutsBubble() {
+    for (var i = 0; i < callouts.length; i++) {
+        ctx.fillStyle = 'rgba(225,225,225,0.8)';
+        w = 50;
+        h = 30;
+        ctx.fillRect(callouts[i].x-w/2, callouts[i].y-h, w, h);
+        ctx.fillStyle = "rgb(0, 0, 0)";
+        ctx.font = "10px Helvetica";
+        ctx.fillText(callouts[i].action, callouts[i].x-w/2, callouts[i].y-h+10);
+    }
+}
 
 function drawObstacles(){
     for (var i = 0; i < obstacles.length; i += 1) {
