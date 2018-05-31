@@ -70,7 +70,7 @@ var ipointsx=[], ipointsy=[];                           // Initial points grid
 var IPS = 2 * grid_granularity;                         // Separation between initial points in grid
 var OBSTACLE_SIZE = 10;                                 // 50/MPR; Size of obstacles
 var stations=[];                                        // charging stations
-var worldobstaclesx=[], worldobstaclesy=[];             // x,y obstacles 0.5x05m in world
+var worldobstaclesx=[], worldobstaclesy=[];             // x, y obstacles 0.5x05m in world
 var route = [];
 var callouts = [];
 var calloutloc = {};
@@ -173,7 +173,6 @@ function coordsWithinPolygon (x, y, cornersX, cornersY) {
 }
 
 function coordsOnLine(x, y, sx, sy, ex, ey) {
-
     tolerance = 3
     var L2 = ( ((ex-sx) * (ex-sx)) + ((ey-sy) * (ey-sy)));
     if (L2 == 0) return false;
@@ -188,7 +187,6 @@ function coordsOnLine(x, y, sx, sy, ex, ey) {
     else {
         return (Math.sqrt(((ex - x) * (ex-x)) + ((ey -y) * (ey-y))) <= tolerance);
     }
-
 }
 
 function removeWallAt(px, py) {

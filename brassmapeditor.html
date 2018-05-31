@@ -58,6 +58,7 @@ Using the editor:
     <tr>
     <td colspan="2">
     Tools: &nbsp;
+    <button type="button" id="removeConnect" onclick="setToolDisconnect(this)">Disconnect</button>
     <button type="button" title="Set origin of coordinates" id="setOriginTool" name="setOriginTool" onclick="setToolOrigin(this)"><i class="fas fa-bullseye"></i></button>
     <button type="button" title="Create waypoint (+alt key eliminates waypoint)" id="createTool" name="createTool" onclick="setToolCreate(this)"><i class="fas fa-map-marker-alt"></i></button>
     <button type="button" title="Connect waypoints" id="connectTool" name="connectTool" onclick="setToolConnect(this)"><i class="fab fa-connectdevelop"></i></button>
@@ -73,6 +74,7 @@ Using the editor:
         <option value="medium"> Medium</option>
         <option value="difficult"> Difficult</option>
     </select>
+    <br>
     Display:
     <input type="checkbox" title="Display background" id="displaybackgroundcheck"> Background
     <input type="checkbox" title="Display lights" id="displaylightscheck" checked> Lights
@@ -82,6 +84,11 @@ Using the editor:
         <button type="button" title="Remove edges from route" id="removeRouteTool" disabled>Remove</button>
         <button type="button" title="Add edges to route" id="addRouteTool" disabled>Add</button>
         <button type="button" title="Add adaptation" id="addAdaptTool" disabled>Add adaptation</button>
+        <select id="adaptSelect" name="adaptSelect">
+            <option value="halfSpeed"> Half speed</option>
+            <option value="fullSpeed"> Full speed</option>
+            <option value="recharge"> Recharge</option>
+        </select>
         <button type="button" title="Remove adaptation" id="removeAdaptTool" onclick="setToolRemoveAdapt(this)" disabled>Remove adaptation</button>
         <button type="button" title="Finish editing route" id="finishRouteTool" disabled>Finish</button>
         <button type="button" title="Start editing route" id="cancelRouteTool">Cancel</button>
