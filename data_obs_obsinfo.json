@@ -1,0 +1,110 @@
+{
+  "mpr": 18.5,
+  "map": [
+    {
+      "node-id": "l1",
+      "coords": {
+        "x": 15.676,
+        "y": 68.865
+      },
+      "connected-to": [
+        "l2"
+      ]
+    },
+    {
+      "node-id": "l2",
+      "coords": {
+        "x": 18.919,
+        "y": 68.865
+      },
+      "connected-to": [
+        "l1",
+        "l3"
+      ]
+    },
+    {
+      "node-id": "l3",
+      "coords": {
+        "x": 22.162,
+        "y": 68.865
+      },
+      "connected-to": [
+        "l2",
+        "l4"
+      ]
+    },
+    {
+      "node-id": "l4",
+      "coords": {
+        "x": 25.405,
+        "y": 68.865
+      },
+      "connected-to": [
+        "l3",
+        "l5"
+      ]
+    },
+    {
+      "node-id": "l5",
+      "coords": {
+        "x": 29.189,
+        "y": 68.865
+      },
+      "connected-to": [
+        "l4",
+        "l6"
+      ]
+    },
+    {
+      "node-id": "l6",
+      "coords": {
+        "x": 32.703,
+        "y": 68.865
+      },
+      "connected-to": [
+        "l5"
+      ]
+    }
+  ],
+  "walls": [],
+  "origin": {
+    "x": 0,
+    "y": 85.622
+  },
+  "unsafe-rects": [],
+  "obstacles": [
+    {
+      "from": "l2",
+      "to": "l3",
+      "id": "medium"
+    },
+    {
+      "from": "l3",
+      "to": "l2",
+      "id": "medium"
+    },
+    {
+      "from": "l2",
+      "to": "l3",
+      "id": "medium"
+    },
+    {
+      "from": "l3",
+      "to": "l2",
+      "id": "medium"
+    }
+  ],
+  "worldobstacles": [
+    {
+      "x": 24.054,
+      "y": 68.865
+    },
+    {
+      "x": 27.297,
+      "y": 68.865
+    }
+  ],
+  "lights": [],
+  "stations": [],
+  "initial-points": []
+}

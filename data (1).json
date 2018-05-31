@@ -1,0 +1,66 @@
+{
+  "mpr": 10,
+  "map": [
+    {
+      "node-id": "l1",
+      "coords": {
+        "x": 37,
+        "y": 149.9
+      },
+      "connected-to": []
+    },
+    {
+      "node-id": "l2",
+      "coords": {
+        "x": 29.5,
+        "y": 127.4
+      },
+      "connected-to": [
+        "l3"
+      ]
+    },
+    {
+      "node-id": "l3",
+      "coords": {
+        "x": 36.5,
+        "y": 127.4
+      },
+      "connected-to": [
+        "l2",
+        "l4"
+      ]
+    },
+    {
+      "node-id": "l4",
+      "coords": {
+        "x": 42.5,
+        "y": 127.4
+      },
+      "connected-to": [
+        "l3"
+      ]
+    }
+  ],
+  "walls": [],
+  "origin": {
+    "x": 0,
+    "y": 158.4
+  },
+  "unsafe-rects": [],
+  "obstacles": [
+    {
+      "from": "l2",
+      "to": "l3",
+      "id": "easy"
+    },
+    {
+      "from": "l3",
+      "to": "l2",
+      "id": "easy"
+    }
+  ],
+  "worldobstacles": [],
+  "lights": [],
+  "stations": [],
+  "initial-points": []
+}
