@@ -32,7 +32,7 @@
   "actions": [
     {
       "id": "l1",
-      "action": ["setSpeedHalf", "recharge"]
+      "action": ["setSpeedHalf", "recharge", "setSpeedFull"]
     },
     {
       "id": "l2",

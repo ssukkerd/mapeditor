@@ -28,6 +28,7 @@ var finishRouteBtn = document.getElementById("finishRouteTool");
 var adaptSelect = document.getElementById("adaptSelect");
 
 var startEditBtn = document.getElementById("startRouteTool");
+var adaptRemoveOptions = document.getElementById("adaptRemoveOptions");
 
 var ctx = canvas.getContext('2d');
 var img = null;
@@ -44,6 +45,8 @@ batteryicon.src = "/icons/battery.png";
 
 rx = ry = 0;  // current cursor position
 v = 3;
+
+var currLabel;
 
 grid_granularity = 5;  // Snap grid cell size
 
@@ -380,6 +383,19 @@ function setToolRemoveAdapt() {
     moving = false;
     tool = 13;
     console.log("Remove adapt tool");
+    if (currLabel && callouts[currLabel] !== undefined) {
+        console.log("trying ")
+        callouts[currLabel].splice(parseInt(adaptRemoveOptions.value, 10), 1);
+    }
+    while(adaptRemoveOptions.options.length) adaptRemoveOptions.options.remove(0);
+    //adding new values to select
+    adapts = callouts[currLabel];
+    for(var i = adapts.length - 1; i >= 0; i--) {
+        var option = document.createElement('option');
+        option.text = adapts[i];
+        option.value = `${i}`;
+        adaptRemoveOptions.add(option, 0);
+    }
 }
 
 function setToolAddAdapt() {
@@ -422,6 +438,23 @@ function moveReporter(e) {
 function clickReporter(e){
     console.log(`point ${rx}, ${ry}`);
 
+    if (routeEdit) {
+        // clearing old values from select
+        console.log("resetting the dropdown");
+        while(adaptRemoveOptions.options.length) adaptRemoveOptions.options.remove(0);
+        //adding new values to select
+        label = getLocationAt(rx,ry);
+        currLabel = label;
+        adapts = callouts[label];
+        for(var i = adapts.length - 1; i >= 0; i--) {
+            var option = document.createElement('option');
+            option.text = adapts[i];
+            option.value = `${i}`;
+            adaptRemoveOptions.add(option, 0);
+        }
+        return;
+    }
+
     if (tool==0){ // Creating waypoints
         if (!e.altKey){
             locationsx.push(rx);
@@ -429,8 +462,8 @@ function clickReporter(e){
             locationsl.push("l"+locationsx.length.toString());
             console.log("l"+locationsx.length.toString()+" created.")
         } else { // Eliminate waypoint
-            var sloc = getLocationAt(rx,ry)
-            slocidx=locationsl.indexOf(sloc)
+            var sloc = getLocationAt(rx,ry);
+            slocidx=locationsl.indexOf(sloc);
             if (slocidx>=0){
                 if (getConnections(sloc).length==0){ // Removed only if waypoint not connected to any other waypoint
                     locationsx.splice(slocidx,1);
@@ -548,13 +581,6 @@ function clickReporter(e){
                 worldobstaclesx.splice(wobs,1);
                 worldobstaclesy.splice(wobs,1);
             }
-        }
-    }
-
-    if (tool == 13) {
-        label = getLocationAt(rx, ry);
-        if (label && callouts[label] !== undefined) {
-            callouts[label].splice(0, 1);
         }
     }
 
