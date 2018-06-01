@@ -28,15 +28,6 @@ var finishRouteBtn = document.getElementById("finishRouteTool");
 var adaptSelect = document.getElementById("adaptSelect");
 
 var startEditBtn = document.getElementById("startRouteTool");
-startEditBtn.addEventListener("click", function() {
-    routeEdit = true;
-    this.disabled = true;
-    addRouteBtn.disabled = false;
-    removeRouteBtn.disabled = false;
-    addAdaptBtn.disabled = false;
-    removeAdaptBtn.disabled = false;
-    finishRouteBtn.disabled = false;
-});
 
 var ctx = canvas.getContext('2d');
 var img = null;
@@ -76,6 +67,28 @@ var worldobstaclesx=[], worldobstaclesy=[];             // x, y obstacles 0.5x05
 var route = [];
 var callouts = [];
 var calloutloc = {};
+
+
+function startModifyRoute() {
+    routeEdit = true;
+    startEditBtn.disabled = true;
+    addRouteBtn.disabled = false;
+    removeRouteBtn.disabled = false;
+    addAdaptBtn.disabled = false;
+    removeAdaptBtn.disabled = false;
+    finishRouteBtn.disabled = false;
+}
+
+function endModifyRoute() {
+    routeEdit = false;
+    startEditBtn.disabled = false;
+    addRouteBtn.disabled = true;
+    removeRouteBtn.disabled = true;
+    addAdaptBtn.disabled = true;
+    removeAdaptBtn.disabled = true;
+    finishRouteBtn.disabled = true;
+}
+
 
 
 // =============================================================================
@@ -985,7 +998,18 @@ function drawTool(){
     if (tool==11){
         strTool = "[remove waypoints]"
     }
-
+    if (tool==13) {
+        strTool = "[remove adaptation]"
+    }
+    if (tool==14) {
+        strTool = "[add adaptation]"
+    }
+    if (tool==15) {
+        strTool = "[remove route edge]"
+    }
+    if (tool==16) {
+        strTool = "[add route edge]"
+    }
     ctx.fillText("Tool:"+strTool,10,50);
 }
 

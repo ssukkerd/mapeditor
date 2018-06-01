@@ -80,7 +80,7 @@ Using the editor:
     <input type="checkbox" title="Display lights" id="displaylightscheck" checked> Lights
     </td>
     <td colspan="3">
-        <button type="button" title="Start editing route" id="startRouteTool">Start</button>
+        <button type="button" title="Start editing route" id="startRouteTool" onclick="startModifyRoute(this)">Start</button>
         <button type="button" title="Remove edges from route" id="removeRouteTool" onclick="setToolRemoveRoute(this)" disabled>Remove</button>
         <button type="button" title="Add edges to route" id="addRouteTool" onclick="setToolAddRoute(this)" disabled>Add</button>
         <button type="button" title="Add adaptation" id="addAdaptTool" onclick="setToolAddAdapt(this)" disabled>Add adaptation</button>
@@ -90,8 +90,7 @@ Using the editor:
             <option value="recharge"> Recharge</option>
         </select>
         <button type="button" title="Remove adaptation" id="removeAdaptTool" onclick="setToolRemoveAdapt(this)" disabled>Remove adaptation</button>
-        <button type="button" title="Finish editing route" id="finishRouteTool" disabled>Finish</button>
-        <button type="button" title="Start editing route" id="cancelRouteTool">Cancel</button>
+        <button type="button" title="Finish editing route" id="finishRouteTool" onclick="endModifyRoute(this)"disabled>Finish</button>
     </td>
 </tr>
 </table>
