@@ -58,7 +58,7 @@ grid_granularity = 5;  // Snap grid cell size
 
 
 // =============================================================================
-// Map vars
+//   Map vars
 // =============================================================================
 
 var MPR = 22;                                           // Meter to pixel ratio
@@ -79,7 +79,7 @@ var calloutloc = {};
 
 
 // =============================================================================
-// Map querying (checking locations at x,y position, etc.)
+//   Map querying (checking locations at x,y position, etc.)
 // =============================================================================
 
 function getLocationAt(x, y) {
@@ -114,7 +114,7 @@ function getCoords(label){
     }
 }
 
-function getConnections(label){
+function getConnections(label) {
     var result=[];
     for (var i=0; i < connections.length; i++){
         if (connections[i].from==label)
@@ -221,6 +221,22 @@ function removeConnectionAt(px, py) {
     }
     connections = newconns;
 }
+
+function removeRouteConnectionAt(px, py) {
+    var newconns=[]
+    console.log("removeconnat "+px.toString()+" "+py.toString())
+
+    for (var i=0; i<routeEdges.length; i++){
+        if (!coordsOnLine(px, py, getCoords(routeEdges[i].from).x,
+            getCoords(routeEdges[i].from).y,
+            getCoords(routeEdges[i].to).x,
+            getCoords(routeEdges[i].to).y )){
+            newconns.push(routeEdges[i]);
+        }
+    }
+    routeEdges = newconns;
+}
+
 
 function removeObstaclesBetweenLocations (l1, l2){
     var auxobstacles=[];
@@ -358,6 +374,13 @@ function setToolAddAdapt() {
     moving = false;
     tool = 14;
     console.log("Add adapt tool");
+}
+
+function setToolRemoveRoute() {
+    connecting = false;
+    moving = false;
+    tool = 15;
+    console.log("Remove route edge tool");
 }
 
 
@@ -515,7 +538,6 @@ function clickReporter(e){
     }
 
     if (tool == 14) {
-        console.log(adaptSelect.value);
         label = getLocationAt(rx, ry);
         if (label) {
             if (callouts[label] === undefined) {
@@ -523,6 +545,10 @@ function clickReporter(e){
             }
             callouts[label].push(adaptSelect.value);
         }
+    }
+
+    if (tool == 15) {
+        removeRouteConnectionAt(rx, ry);
     }
 
 }
@@ -592,7 +618,7 @@ function exportMap(el) {
         coord1["y"]=parseFloat(coord1["y"]);
         coord2["x"]=parseFloat(coord2["x"]);
         coord2["y"]=parseFloat(coord2["y"]);
-        var objw = {"p1": coord1, "p2": coord2 };
+        var objw = {"p1": coord1, "p2": coord2};
         walls.push(objw);
     }
 
@@ -784,18 +810,27 @@ function parseMap() {
 }
 
 
+var routeEdges = []
 
 function parseRoute() {
+
     var routeList = actual_JSON_route["route"];
-    for (var i = 0; i < routeList.length - 1; i++) {
-        route.push({from: routeList[i], to: routeList[i+1]});
+
+    for (var i = 0; i < routeList.length; i++){
+        // pcoord = metersToPixels([JSONmap["map"][i]["coords"]["x"], JSONmap["map"][i]["coords"]["y"]]);
+        idx = getLocationIndex(routeList[i]["id"]);
+
+        for (var j = 0; j < routeList[i]["connected-to"].length; j++){
+            routeEdges.push({from: routeList[i]["node-id"],to: routeList[i]["connected-to"][j]});
+        }
     }
+
     var actions = actual_JSON_route["actions"];
     for (var i = 0; i < actions.length; i++) {
         label = actions[i]["id"];
         callouts[label] = actions[i]["action"]
     }
-    console.log(callouts);
+    console.log(routeEdges);
 }
 
 
@@ -960,11 +995,11 @@ function drawConnections(){
 /* Function to draw robot routes */
 function drawConnectionsRoute(){
     ctx.strokeStyle = '#0000ff';
-    ctx.lineWidth=2;
+    ctx.lineWidth = 2;
     ctx.beginPath();
-    for (var i = 0; i < route.length; i += 1) {
-        to = getCoords(route[i].to);
-        from = getCoords(route[i].from);
+    for (var i = 0; i < routeEdges.length; i += 1) {
+        to = getCoords(routeEdges[i].to);
+        from = getCoords(routeEdges[i].from);
 
         tox = to.x;
         toy = to.y;

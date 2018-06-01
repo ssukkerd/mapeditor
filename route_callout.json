@@ -1,6 +1,33 @@
 {
   "route": [
-    "l1", "l2", "l10"
+    {
+      "node-id": "l1",
+      "coords": {
+        "x": -30.75,
+        "y": 9.5
+      },
+      "connected-to": [
+        "l2"
+      ]
+    },
+    {
+      "node-id": "l2",
+      "coords": {
+        "x": -26.5,
+        "y": 9.5
+      },
+      "connected-to": [
+        "l10"
+      ]
+    },
+    {
+      "node-id": "l10",
+      "coords": {
+        "x": -26.5,
+        "y": 0
+      },
+      "connected-to": []
+    }
   ],
   "actions": [
     {
