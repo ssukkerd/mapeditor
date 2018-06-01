@@ -4,7 +4,6 @@
     <list default="true" id="ef80b830-21e5-4868-bf3a-54abcf6c6635" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/brassmapeditor.html" beforeDir="false" afterPath="$PROJECT_DIR$/brassmapeditor.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/main.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/route_callout.json" beforeDir="false" afterPath="$PROJECT_DIR$/route_callout.json" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -21,8 +20,8 @@
       <file leaf-file-name="brassmapeditor.html" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/brassmapeditor.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="459">
-              <caret line="92" column="104" lean-forward="true" selection-start-line="92" selection-start-column="104" selection-end-line="92" selection-end-column="104" />
+            <state relative-caret-position="331">
+              <caret line="100" column="31" lean-forward="true" selection-start-line="100" selection-start-column="31" selection-end-line="100" selection-end-column="31" />
               <folding>
                 <element signature="n#tr#0;n#table#0;n#!!top" />
                 <element signature="n#style#0;n#i#0;n#button#9;n#font#0;n#tr#1;n#table#0;n#body#0;n#html#0;n#!!top" expanded="true" />
@@ -31,32 +30,14 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="route_callout.json" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/route_callout.json">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="382">
-              <caret line="28" column="24" lean-forward="true" selection-start-line="28" selection-start-column="24" selection-end-line="28" selection-end-column="24" />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="main.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/main.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="336">
-              <caret line="547" column="5" lean-forward="true" selection-start-line="547" selection-start-column="5" selection-end-line="547" selection-end-column="5" />
+            <state relative-caret-position="279">
+              <caret line="383" column="1" lean-forward="true" selection-start-line="383" selection-start-column="1" selection-end-line="383" selection-end-column="1" />
               <folding>
                 <element signature="e#22239#22974#0" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="data.json" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/data.json">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="184">
-              <caret line="108" column="23" lean-forward="true" selection-start-line="108" selection-start-column="23" selection-end-line="108" selection-end-column="23" />
             </state>
           </provider>
         </entry>
@@ -74,8 +55,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>drawLocations</find>
-      <find>rx</find>
       <find>console.log</find>
       <find>clickRepo</find>
       <find>render(</find>
@@ -102,8 +81,10 @@
       <find>parseRou</find>
       <find>parseRoute</find>
       <find>setTo</find>
-      <find>remove</find>
       <find>removeCon</find>
+      <find>connect</find>
+      <find>tool==</find>
+      <find>remove</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -204,20 +185,20 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="40996000" />
+    <option name="totallyTimeSpent" value="42016000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1280" height="800" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.06875" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.06875" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Event Log" order="11" side_tool="true" />
       <window_info anchor="bottom" id="Run" order="2" />
       <window_info anchor="bottom" id="Version Control" order="9" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info anchor="bottom" id="Terminal" order="8" visible="true" weight="0.14839572" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="8" visible="true" weight="0.2606952" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -559,17 +540,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/brassmapeditor.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="459">
-          <caret line="92" column="104" lean-forward="true" selection-start-line="92" selection-start-column="104" selection-end-line="92" selection-end-column="104" />
-          <folding>
-            <element signature="n#tr#0;n#table#0;n#!!top" />
-            <element signature="n#style#0;n#i#0;n#button#9;n#font#0;n#tr#1;n#table#0;n#body#0;n#html#0;n#!!top" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/route_callout.json">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="382">
@@ -577,10 +547,21 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/brassmapeditor.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="331">
+          <caret line="100" column="31" lean-forward="true" selection-start-line="100" selection-start-column="31" selection-end-line="100" selection-end-column="31" />
+          <folding>
+            <element signature="n#tr#0;n#table#0;n#!!top" />
+            <element signature="n#style#0;n#i#0;n#button#9;n#font#0;n#tr#1;n#table#0;n#body#0;n#html#0;n#!!top" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/main.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="336">
-          <caret line="547" column="5" lean-forward="true" selection-start-line="547" selection-start-column="5" selection-end-line="547" selection-end-column="5" />
+        <state relative-caret-position="279">
+          <caret line="383" column="1" lean-forward="true" selection-start-line="383" selection-start-column="1" selection-end-line="383" selection-end-column="1" />
           <folding>
             <element signature="e#22239#22974#0" />
           </folding>

@@ -382,6 +382,12 @@ function setToolRemoveRoute() {
     tool = 15;
     console.log("Remove route edge tool");
 }
+function setToolAddRoute(){
+    connecting = false;
+    moving = false;
+    tool = 16;
+    console.log("Add route edge tool");
+}
 
 
 // Handles mouse move events
@@ -551,6 +557,36 @@ function clickReporter(e){
         removeRouteConnectionAt(rx, ry);
     }
 
+    if (tool==16){ // Creating connections between locations
+        if (connecting==false){  // If starting a connection (selecting start node)
+            initStroke = getLocationAt(rx,ry);
+            if (initStroke!=""){
+                connecting = true;
+            }
+        } else {   // If finishing a connection (selecting end node)
+            endStroke = getLocationAt(rx,ry);
+            if (endStroke!="" && endStroke!=initStroke && !edgeExists(initStroke,endStroke)){
+                connecting = false;
+                routeEdges.push({from:initStroke,to:endStroke});
+            }
+        }
+    }
+
+}
+
+
+/** helpers for tool==16, adding route edges */
+function getRouteConnections(label) {
+    var result=[];
+    for (var i=0; i < routeEdges.length; i++){
+        if (routeEdges[i].from==label)
+            result.push(routeEdges[i].to);
+    }
+    return result;
+}
+
+function edgeExists(l1,l2){
+    return (getRouteConnections(l1).indexOf(l2)>=0);
 }
 
 
