@@ -496,6 +496,8 @@ function clickReporter(e){
                 obstacles.push({from:endStroke,to:initStroke});
                 obstaclelabels.push(attEdit.value);
                 obstaclelabels.push(attEdit.value);
+                console.log(obstacles);
+                console.log(obstaclelabels);
             }
         }
     }
@@ -930,7 +932,7 @@ function render(){
     drawLocations();
     drawConnections();
     drawWorldObstacles();
-    //drawObstacles();
+    drawObstacles();
     drawOrigin();
     drawWalls();
     drawConnectionsRoute();
@@ -1093,17 +1095,19 @@ function drawCallouts() {
 
         actions = callouts[label];
 
-        for (var i = 0; i < actions.length; i++) {
-            ctx.fillStyle = "rgb(0, 200, 0)";
-            ctx.fillRect(x-grid_granularity/2, y-grid_granularity/2, grid_granularity, grid_granularity);
+        ctx.fillStyle = "rgb(0, 200, 0)";
+        ctx.fillRect(x-grid_granularity/2, y-grid_granularity/2, grid_granularity, grid_granularity);
 
-            ctx.fillStyle = 'rgba(225,225,225,0.8)';
-            w = 50;
-            h = 20;
-            ctx.fillRect(x-w/2, y-h, w, h);
-            ctx.fillStyle = "rgb(0, 0, 0)";
-            ctx.font = "10px Helvetica";
-            ctx.fillText(actions[i], x-w/2, y-h+10);
+        w = 75;
+        h = 12*actions.length;
+        ctx.fillStyle = 'rgba(225,225,225,0.8)';
+        ctx.fillRect(x-w/2, y-h, w, h);
+
+        ctx.fillStyle = "rgb(0, 0, 0)";
+        ctx.font = "10px Helvetica";
+
+        for (var i = 0; i < actions.length; i++) {
+            ctx.fillText(`${i+1}. ` + actions[i], x-w/2, y-h+10+(12*i));
         }
     }
 }
