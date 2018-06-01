@@ -4,20 +4,12 @@
   ],
   "actions": [
     {
-      "id": "c1",
-      "coords": {
-        "x": 320,
-        "y": 310
-      },
-      "action": "setSpeedHalf"
+      "id": "l1",
+      "action": ["setSpeedHalf"]
     },
     {
-      "id": "c2",
-      "coords": {
-        "x": 365,
-        "y": 405
-      },
-      "action": "recharge"
+      "id": "l2",
+      "action": ["recharge"]
     }
   ],
   "start": "l1",

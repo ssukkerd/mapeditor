@@ -25,6 +25,8 @@ var addAdaptBtn = document.getElementById("addAdaptTool");
 var removeAdaptBtn = document.getElementById("removeAdaptTool");
 var finishRouteBtn = document.getElementById("finishRouteTool");
 
+var adaptSelect = document.getElementById("adaptSelect");
+
 var startEditBtn = document.getElementById("startRouteTool");
 startEditBtn.addEventListener("click", function() {
     routeEdit = true;
@@ -348,7 +350,14 @@ function setToolRemoveAdapt() {
     connecting = false;
     moving = false;
     tool = 13;
-    console.log("remove adapt tool");
+    console.log("Remove adapt tool");
+}
+
+function setToolAddAdapt() {
+    connecting = false;
+    moving = false;
+    tool = 14;
+    console.log("Add adapt tool");
 }
 
 
@@ -499,10 +508,20 @@ function clickReporter(e){
     }
 
     if (tool == 13) {
-        if (callouts[rx] != undefined && callouts[rx][ry] != undefined) {
-            // assuming only one action per node.
-            // maybe in the case of multiple, can give a drop down menu to choose which to delete?
-            callouts[rx][ry].splice(0, 1);
+        label = getLocationAt(rx, ry);
+        if (label && callouts[label] !== undefined) {
+            callouts[label].splice(0, 1);
+        }
+    }
+
+    if (tool == 14) {
+        console.log(adaptSelect.value);
+        label = getLocationAt(rx, ry);
+        if (label) {
+            if (callouts[label] === undefined) {
+                callouts[label] = []
+            }
+            callouts[label].push(adaptSelect.value);
         }
     }
 
@@ -764,6 +783,8 @@ function parseMap() {
     document.getElementById('mpr').value = MPR
 }
 
+
+
 function parseRoute() {
     var routeList = actual_JSON_route["route"];
     for (var i = 0; i < routeList.length - 1; i++) {
@@ -771,19 +792,8 @@ function parseRoute() {
     }
     var actions = actual_JSON_route["actions"];
     for (var i = 0; i < actions.length; i++) {
-        x = actions[i]["coords"]["x"];
-        y = actions[i]["coords"]["y"];
-        action = actions[i]["action"];
-        if (callouts[x] != undefined) {
-            if (callouts[x][y] != undefined) {
-                callouts[x][y].push(action)
-            } else {
-                callouts[x][y] = [action];
-            }
-        } else {
-            callouts[x] = {};
-            callouts[x][y] = [action];
-        }
+        label = actions[i]["id"];
+        callouts[label] = actions[i]["action"]
     }
     console.log(callouts);
 }
@@ -977,26 +987,29 @@ function drawConnectionsRoute(){
 }
 
 function drawCallouts() {
-    for (var x in callouts) {
-        if (!callouts.hasOwnProperty(x)) continue;
-        col = callouts[x];
-        for (var y in col) {
-            if (!col.hasOwnProperty(y)) continue;
-            row = col[y];
-            for (var i = 0; i < row.length; i++) {
-                ctx.fillStyle = "rgb(0, 200, 0)";
-                ctx.fillRect(x-grid_granularity/2, y-grid_granularity/2, grid_granularity, grid_granularity);
+    for (var label in callouts) {
+        if (!callouts.hasOwnProperty(label)) continue;
 
-                ctx.fillStyle = 'rgba(225,225,225,0.8)';
-                w = 50;
-                h = 30;
-                ctx.fillRect(x-w/2, y-h, w, h);
-                ctx.fillStyle = "rgb(0, 0, 0)";
-                ctx.font = "10px Helvetica";
-                ctx.fillText(row[i], x-w/2, y-h+10);
-            }
+        idx = getLocationIndex(label);
+        if (idx === -1) continue;
+
+        var x = locationsx[idx];
+        var y = locationsy[idx];
+
+        actions = callouts[label];
+
+        for (var i = 0; i < actions.length; i++) {
+            ctx.fillStyle = "rgb(0, 200, 0)";
+            ctx.fillRect(x-grid_granularity/2, y-grid_granularity/2, grid_granularity, grid_granularity);
+
+            ctx.fillStyle = 'rgba(225,225,225,0.8)';
+            w = 50;
+            h = 20;
+            ctx.fillRect(x-w/2, y-h, w, h);
+            ctx.fillStyle = "rgb(0, 0, 0)";
+            ctx.font = "10px Helvetica";
+            ctx.fillText(actions[i], x-w/2, y-h+10);
         }
-
     }
 }
 
