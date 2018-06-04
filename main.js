@@ -438,7 +438,7 @@ function moveReporter(e) {
 function clickReporter(e){
     console.log(`point ${rx}, ${ry}`);
 
-    if (routeEdit) {
+    if (routeEdit && tool !== 14 && tool !== 15 && tool !== 16) {
         // clearing old values from select
         console.log("resetting the dropdown");
         while(adaptRemoveOptions.options.length) adaptRemoveOptions.options.remove(0);
